@@ -86,6 +86,13 @@
             <artifactId>oshi-core</artifactId>
             <version>5.7.1</version>
         </dependency>
+
+        <!-- Convert pdf to word -->
+        <dependency>
+            <groupId>e-iceblue</groupId>
+            <artifactId>spire.pdf</artifactId>
+            <version>4.1.2</version>
+        </dependency>
     </dependencies>
 
     <!-- 打包 -->
