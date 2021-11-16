@@ -54,7 +54,8 @@ public class AppRun {
     @Bean
     public ServletWebServerFactory webServerFactory() {
         TomcatServletWebServerFactory fa = new TomcatServletWebServerFactory();
-        fa.addConnectorCustomizers(connector -> connector.setProperty("relaxedQueryChars", "[]{}"));
+        fa.addConnectorCustomizers(connector -> connector.setProperty("relaxedPathChars", "\"<>[\\]^`{|}"));
+        fa.addConnectorCustomizers(connector -> connector.setProperty("relaxedQueryChars", "\"<>[\\]^`{|}"));
         return fa;
     }
 
