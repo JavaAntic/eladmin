@@ -86,8 +86,28 @@
             <artifactId>oshi-core</artifactId>
             <version>5.7.1</version>
         </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <!-- Convert pdf to word -->
+        <dependency>
+            <groupId>e-iceblue</groupId>
+            <artifactId>spire.pdf</artifactId>
+            <version>4.1.2</version>
+        </dependency>
     </dependencies>
-
+    <repositories>
+        <repository>
+            <id>com.e-iceblue</id>
+            <name>e-iceblue</name>
+            <url>http://repo.e-iceblue.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
     <!-- 打包 -->
     <build>
         <plugins>
