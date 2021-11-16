@@ -87,9 +87,8 @@ public class ReadWordCopy {
     private static List<Table> tableList = new ArrayList<>();
 
     public static void main(String[] args) {
-        //String templatePath = RadeWordCopy.class.getResource("/templates/test.docx").getPath();
         InputStream inputStream = null;
-        //File templatePath = new File("D:\\Desktop\\poc\\CCCCFK-iOS应用安全测评报告（2021-08-23-14-27-41)_梆梆.docx");
+        //String templatePath = RadeWordCopy.class.getResource("/templates/test.docx").getPath();
         //File templatePath = new File("D:\\Desktop\\poc\\CCCCFK-iOS应用安全测评报告（2021-08-23-14-27-41)_梆梆.docx");
         File templatePath = new File("D:\\Desktop\\poc\\光大发卡_4.4.40_iOS应用安全检测报告_监管者_20210823222852_爱加密.docx");
         try {
@@ -97,13 +96,12 @@ public class ReadWordCopy {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        byte[] a = exportWord(inputStream,null, null, null,null);
-        //InputStream sbs = new ByteArrayInputStream(a);
-        //a = exportWord(sbs,null, null, null,null);
+        // 读取word文件,转文件流
+        byte[] a = exportWord(inputStream);
         byteToFile(a, "D:\\Desktop\\个人\\test", "zzz.docx");
+        // 调用任务管理器打开目标文件
         Runtime run = Runtime.getRuntime();
         try {
-//			Process process = run.exec("cmd.exe /k start " + cmdStr);
             Process process = run.exec("cmd.exe /c " + "D:\\Desktop\\个人\\test\\zzz.docx");
             InputStream in = process.getInputStream();
             while (in.read() != -1) {
@@ -116,13 +114,10 @@ public class ReadWordCopy {
         }
     }
     /**
-     *
-     * @param paragraphMap word中文本
-     * @param tableMapMap 表格中数据(非循环)
-     * @param familyListMap 表格中数据列表
+     * 读取word主流程
      * @return
      */
-    public static byte[] exportWord(InputStream inputStream, Map<String, String> paragraphMap,Map<String,Map<String, String>> tableMapMap,Map<String,List<String[]>> familyListMap,LinkedHashMap<String,List<String[]>> activeListMap) {
+    public static byte[] exportWord(InputStream inputStream) {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         XWPFDocument document = null;
         try {
@@ -132,10 +127,6 @@ public class ReadWordCopy {
             getParagraphText(document);
             // 获取表格信息
             getTableText(document);
-            //copyHeaderInsertText(document, familyListMap, 7);
-            // *****************动态追加表格开始***************
-            //copyActiveTable(document,familyListMap!=null?true:false,activeListMap,7);
-            // *****************动态追加表格结束***************
             document.write(byteOut);
         } catch (IOException e) {
             e.printStackTrace();
@@ -162,13 +153,6 @@ public class ReadWordCopy {
     public static File byteToFile(byte[] byteStr, String path, String fileName) {
         File savefile = null;
         savefile = new File(path, fileName);
-        // 创建文件夹
-        //if (savefile.exists()) {
-        //    savefile.delete();
-        //    savefile.mkdirs();
-        //} else {
-        //    savefile.mkdirs();
-        //}
         BufferedOutputStream bos = null;
         FileOutputStream fos = null;
         try {
