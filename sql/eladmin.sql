@@ -816,6 +816,49 @@ CREATE TABLE `tool_qiniu_content` (
   UNIQUE KEY `uniq_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='七牛云文件存储';
 
+-- `yusys-poc`.st_document definition
+DROP TABLE IF EXISTS `st_document`;
+CREATE TABLE `st_document` (
+  `id` varchar(32) NOT NULL COMMENT 'id',
+  `file_type` varchar(1) NOT NULL COMMENT '文件类型 0:word 1:pdf 2:excel',
+  `safe_type` varchar(1) NOT NULL COMMENT '安全类型0:通付盾 1:梆梆安全 2:爱加密',
+  `file_name` varchar(100) NOT NULL COMMENT '文件名称',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
+  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文档表';
+
+-- `yusys-poc`.st_document_paragraph definition
+DROP TABLE IF EXISTS `st_document_paragraph`;
+CREATE TABLE `st_document_paragraph` (
+  `id` varchar(32) NOT NULL COMMENT 'id',
+  `document_id` varchar(32) NOT NULL COMMENT '文档id',
+  `location` int(11) DEFAULT NULL COMMENT '段落位置',
+  `style` varchar(255) DEFAULT NULL COMMENT '文本级别',
+  `text` longtext COMMENT '段落文本',
+  `runs` longtext COMMENT '段落内信息',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
+  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文档段落表';
+
+-- `yusys-poc`.st_document_table definition
+DROP TABLE IF EXISTS `st_document_table`;
+CREATE TABLE `st_document_table` (
+  `id` varchar(32) NOT NULL COMMENT 'id',
+  `document_id` varchar(32) NOT NULL COMMENT '文档id',
+  `location` int(11) DEFAULT NULL COMMENT '表格位置',
+  `data_size` int(11) DEFAULT NULL COMMENT '表格数据量',
+  `text` longtext COMMENT '表格文本',
+  `rows` longtext COMMENT '表格内行信息',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
+  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文档表格表';
+
 -- ----------------------------
 -- Records of tool_qiniu_content
 -- ----------------------------

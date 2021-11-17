@@ -27,7 +27,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@Table(name = "ST_DOCUMENT_PARAGRAPH")
+@Table(name = "st_document_paragraph")
 public class DocumentParagraph extends BaseEntity implements Serializable {
 
     @Id
@@ -40,12 +40,12 @@ public class DocumentParagraph extends BaseEntity implements Serializable {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "document_id", referencedColumnName = "id")
     @ApiModelProperty(value = "文档id")
     private Document document;
 
     @ApiModelProperty(value = "段落位置")
-    private Integer index;
+    private Integer location;
 
     @ApiModelProperty(value = "文本级别")
     private String style;
@@ -67,7 +67,7 @@ public class DocumentParagraph extends BaseEntity implements Serializable {
         DocumentParagraph documentParagraph = (DocumentParagraph) o;
         return Objects.equals(id, documentParagraph.id) &&
                 Objects.equals(document, documentParagraph.document) &&
-                Objects.equals(index, documentParagraph.index) &&
+                Objects.equals(location, documentParagraph.location) &&
                 Objects.equals(style, documentParagraph.style) &&
                 Objects.equals(text, documentParagraph.text) &&
                 Objects.equals(runs, documentParagraph.runs);
@@ -75,6 +75,6 @@ public class DocumentParagraph extends BaseEntity implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, document, index, style, text, runs);
+        return Objects.hash(id, document, location, style, text, runs);
     }
 }

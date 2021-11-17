@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.annotation.Log;
-import me.zhengjie.modules.system.domain.DictDetail;
 import me.zhengjie.modules.system.domain.Document;
 import me.zhengjie.modules.system.service.DocumentService;
 import me.zhengjie.modules.system.domain.vo.DocumentVo;
@@ -38,8 +37,8 @@ public class DocumentController {
     @ApiOperation("上传文件")
     @PostMapping
     @PreAuthorize("@el.check('doc:upload')")
-    public ResponseEntity<Object> upload(@RequestParam String name, @RequestParam String safeType, @RequestParam("file") MultipartFile file) throws Exception {
-        documentService.upload(name, safeType, file);
+    public ResponseEntity<Object> upload(@RequestParam String name, @RequestParam boolean isModel, @RequestParam("file") MultipartFile file) throws Exception {
+        documentService.upload(name, isModel, file);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -47,7 +46,7 @@ public class DocumentController {
     @ApiOperation("修改文档详情")
     @PutMapping
     @PreAuthorize("@el.check('doc:edit')")
-    public ResponseEntity<Object> update(@Validated(Document.Update.class) @RequestBody Document resources){
+    public ResponseEntity<Object> update(@Validated(Document.Update.class) @RequestBody Document resources) {
         documentService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

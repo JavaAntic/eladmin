@@ -19,7 +19,7 @@ public class DocumentParagraphRunDto implements Serializable {
     /**
      * 文本位置
      */
-    private int index;
+    private int location;
     /**
      * 文本内容
      */

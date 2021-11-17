@@ -21,7 +21,7 @@ public class DocumentParagraphDto extends BaseDTO implements Serializable {
 
     private DocumentDto document;
 
-    private Integer index;
+    private Integer location;
 
     private String style;
 
