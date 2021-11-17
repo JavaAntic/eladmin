@@ -40,7 +40,7 @@ public class DocumentParagraph extends BaseEntity implements Serializable {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "document_id", referencedColumnName = "id")
     @ApiModelProperty(value = "文档id")
     private Document document;
 
