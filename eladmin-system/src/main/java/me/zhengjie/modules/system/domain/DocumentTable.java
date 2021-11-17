@@ -27,7 +27,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@Table(name = "ST_DOCUMENT_TABLE")
+@Table(name = "st_document_table")
 public class DocumentTable extends BaseEntity implements Serializable {
 
     @Id
@@ -45,7 +45,7 @@ public class DocumentTable extends BaseEntity implements Serializable {
     private Document document;
 
     @ApiModelProperty(value = "表格位置")
-    private Integer index;
+    private Integer location;
 
     @ApiModelProperty(value = "表格数据量")
     private Integer dataSize;
@@ -67,7 +67,7 @@ public class DocumentTable extends BaseEntity implements Serializable {
         DocumentTable documentTable = (DocumentTable) o;
         return Objects.equals(id, documentTable.id) &&
                 Objects.equals(document, documentTable.document) &&
-                Objects.equals(index, documentTable.index) &&
+                Objects.equals(location, documentTable.location) &&
                 Objects.equals(dataSize, documentTable.dataSize) &&
                 Objects.equals(text, documentTable.text) &&
                 Objects.equals(rows, documentTable.rows);
@@ -75,6 +75,6 @@ public class DocumentTable extends BaseEntity implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, document, index, dataSize, text, rows);
+        return Objects.hash(id, document, location, dataSize, text, rows);
     }
 }

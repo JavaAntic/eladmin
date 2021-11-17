@@ -49,7 +49,7 @@ public enum FileTypeEnum {
                 code = EXCEL.getCode();
                 break;
             default:
-                throw new Exception("类型[" + suffix + "]暂不支持");
+                throw new Exception("文档类型[" + suffix + "]暂不支持");
         }
         return code;
     }

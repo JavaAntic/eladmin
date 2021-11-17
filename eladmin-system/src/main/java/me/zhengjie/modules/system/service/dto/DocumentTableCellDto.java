@@ -19,7 +19,7 @@ public class DocumentTableCellDto implements Serializable {
     /**
      * 位置
      */
-    private int index;
+    private int location;
     /**
      * 列内文本
      */

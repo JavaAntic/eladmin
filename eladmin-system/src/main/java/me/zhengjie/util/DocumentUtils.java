@@ -84,7 +84,7 @@ public class DocumentUtils {
             // 处理表格行
             t.setDocument(documentDto);
             t.setDataSize(table.getNumberOfRows());
-            t.setIndex(i);
+            t.setLocation(i);
             t.setText(table.getText());
             t.setRows(readRow(table));
             tableList.add(t);
@@ -110,11 +110,11 @@ public class DocumentUtils {
             for (XWPFTableCell cell : cells) {
                 DocumentTableCellDto cell1 = new DocumentTableCellDto();
                 cell1.setParagraphs(readTableParagraph(cell.getParagraphs()));
-                cell1.setIndex(cellIndex);
+                cell1.setLocation(cellIndex);
                 tCells.add(cell1);
                 cellIndex++;
             }
-            row1.setIndex(rowIndex);
+            row1.setLocation(rowIndex);
             row1.setCells(tCells);
             rows.add(row1);
             rowIndex++;
@@ -136,7 +136,7 @@ public class DocumentUtils {
             DocumentParagraphDto p = new DocumentParagraphDto();
             p.setDocument(documentDto);
             p.setStyle(paragraph.getStyle());
-            p.setIndex(index);
+            p.setLocation(index);
             p.setText(paragraph.getText());
             p.setRuns(getDocumentParagraphRun(paragraph));
             pList.add(p);
@@ -158,7 +158,7 @@ public class DocumentUtils {
         for (XWPFParagraph paragraph : paragraphs) {
             DocumentTableParagraphDto p = new DocumentTableParagraphDto();
             p.setStyle(paragraph.getStyle());
-            p.setIndex(index);
+            p.setLocation(index);
             p.setText(paragraph.getText());
             p.setRuns(getDocumentParagraphRun(paragraph));
             pList.add(p);
@@ -172,7 +172,7 @@ public class DocumentUtils {
         int runIndex = 0;
         for (XWPFRun run : paragraph.getRuns()) {
             DocumentParagraphRunDto run1 = new DocumentParagraphRunDto();
-            run1.setIndex(runIndex);
+            run1.setLocation(runIndex);
             run1.setText(run.toString());
             runs.add(run1);
             runIndex++;

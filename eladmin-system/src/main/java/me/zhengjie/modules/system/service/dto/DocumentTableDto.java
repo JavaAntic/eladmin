@@ -21,7 +21,7 @@ public class DocumentTableDto extends BaseDTO implements Serializable {
 
     private DocumentDto document;
 
-    private Integer index;
+    private Integer location;
 
     private Integer dataSize;
 

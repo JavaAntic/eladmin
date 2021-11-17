@@ -18,7 +18,7 @@ import java.util.List;
 public class DocumentTableParagraphDto implements Serializable {
     private String id;
 
-    private Integer index;
+    private Integer location;
 
     private String style;
 
