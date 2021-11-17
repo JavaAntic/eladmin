@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import me.zhengjie.annotation.Log;
 import me.zhengjie.modules.system.domain.Document;
 import me.zhengjie.modules.system.service.DocumentService;
+import me.zhengjie.modules.system.domain.vo.DocumentVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,5 +49,12 @@ public class DocumentController {
     public ResponseEntity<Object> update(@Validated(Document.Update.class) @RequestBody Document resources) {
         documentService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @ApiOperation("安全工具报告列表")
+    @PostMapping("/documentList")
+    //@PreAuthorize("@el.check('doc:upload')")
+    public ResponseEntity<Object> documentList(@RequestBody DocumentVo vo){
+        return new ResponseEntity<>(documentService.getList(),HttpStatus.OK);
     }
 }
