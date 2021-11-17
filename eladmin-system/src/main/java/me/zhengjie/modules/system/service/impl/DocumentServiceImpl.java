@@ -1,6 +1,8 @@
 package me.zhengjie.modules.system.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.spire.pdf.FileFormat;
+import com.spire.pdf.PdfDocument;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.config.FileProperties;
 import me.zhengjie.exception.BadRequestException;
@@ -17,6 +19,7 @@ import me.zhengjie.modules.system.service.mapstruct.DocumentParagraphMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentTableMapper;
 import me.zhengjie.util.DocumentUtils;
 import me.zhengjie.util.FileTypeEnum;
+import me.zhengjie.util.SafeTypeEnum;
 import me.zhengjie.utils.FileUtil;
 import me.zhengjie.utils.StringUtils;
 import org.springframework.cache.annotation.CacheConfig;
@@ -26,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -55,35 +59,81 @@ public class DocumentServiceImpl implements DocumentService {
         name = StringUtils.isBlank(name) ? FileUtil.getFileNameNoEx(multipartFile.getOriginalFilename()) : name;
         String suffix = FileUtil.getExtensionName(name);
         String type = FileUtil.getFileType(suffix);
-        File file = FileUtil.upload(multipartFile, properties.getPath().getPath() + type + File.separator);
-        if (ObjectUtil.isNull(file)) {
+        if (ObjectUtil.isNull(multipartFile)) {
             throw new BadRequestException("上传失败");
         }
         if (StringUtils.isEmpty(suffix)) {
             throw new BadRequestException("文件类型不支持");
         }
+        final String docType = FileTypeEnum.getType(suffix);
+        File file = saveDocument(multipartFile, type, docType);
         if (!isModel) {
-            final String substring = name.substring(0, name.indexOf("."));
-            final String[] split = substring.split("_");
-            String safeType = split[split.length - 1];
-            final List<String> safeTypeList = properties.getSafeType();
-            if (!safeTypeList.contains(safeType)) {
-                throw new BadRequestException("文件名不符合规则：解析安全类型失败！");
-            }
-            try (InputStream inputStream = new FileInputStream(file)) {
-                // 读取word文件,转文件流
-                final Document document = new Document(name, FileTypeEnum.getType(suffix), safeType);
-                final DocumentDto documentDto = documentMapper.toDto(documentRepository.save(document));
-                DocumentUtils.exportWord(inputStream, documentDto);
-                final List<DocumentParagraph> documentParagraphs = documentParagraphMapper.toEntity(DocumentUtils.getParagraphList());
-                documentParagraphRepository.saveAll(documentParagraphs);
-                final List<DocumentTable> documentTables = documentTableMapper.toEntity(DocumentUtils.getTableList());
-                documentTableRepository.saveAll(documentTables);
-            } catch (Exception e) {
-                FileUtil.del(file);
-                throw e;
-            }
+            parseDocument(name, docType, file);
         }
+    }
+
+    /**
+     * 解析非模板文档
+     *
+     * @param name    文件名
+     * @param docType 文档类型
+     * @param file    文档文件
+     * @throws Exception /
+     */
+    private void parseDocument(String name, String docType, File file) throws Exception {
+        final String substring = name.substring(0, name.lastIndexOf("."));
+        final String[] split = substring.split("_");
+        String safeType = split[split.length - 1];
+        final List<String> safeTypeList = properties.getSafeType();
+        if (!safeTypeList.contains(safeType)) {
+            throw new BadRequestException("文件名不符合规则：解析安全类型失败！");
+        }
+        try (InputStream inputStream = new FileInputStream(file)) {
+            // 读取word文件,转文件流
+            final Document document = new Document(name, docType, SafeTypeEnum.getType(safeType));
+            final DocumentDto documentDto = documentMapper.toDto(documentRepository.save(document));
+            DocumentUtils.exportWord(inputStream, documentDto);
+            final List<DocumentParagraph> documentParagraphs = documentParagraphMapper.toEntity(DocumentUtils.getParagraphList());
+            documentParagraphRepository.saveAll(documentParagraphs);
+            final List<DocumentTable> documentTables = documentTableMapper.toEntity(DocumentUtils.getTableList());
+            documentTableRepository.saveAll(documentTables);
+        } catch (Exception e) {
+            FileUtil.del(file);
+            throw e;
+        }
+    }
+
+    /**
+     * 文档保存本地磁盘
+     * pdf：转word再保存
+     * word直接保存
+     *
+     * @param multipartFile 媒体文件
+     * @param type          文件类型
+     * @param docType       文档类型
+     * @return 本地文件
+     * @throws IOException /
+     */
+    private File saveDocument(MultipartFile multipartFile, String type, String docType) throws IOException {
+        File file;
+        final String filePath = properties.getPath().getPath() + type + File.separator;
+        if (FileTypeEnum.PDF.getCode().equals(docType)) {
+            // PDF 转 WORD
+            try (InputStream inputStream = multipartFile.getInputStream()) {
+                final String absFilename = filePath + FileUtil.generateFileName(multipartFile, FileFormat.DOCX.getName().toLowerCase());
+                PdfDocument pdf = new PdfDocument();
+                //Load a PDF file
+                pdf.loadFromStream(inputStream);
+                //Save to .docx file
+                pdf.saveToFile(absFilename, FileFormat.DOCX);
+                pdf.close();
+                file = new File(absFilename);
+            }
+        } else {
+            // 保存文件到本地磁盘
+            file = FileUtil.upload(multipartFile, filePath);
+        }
+        return file;
     }
 
     @Override
