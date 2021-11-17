@@ -5,7 +5,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -24,24 +26,25 @@ public class RadeWord {
         paragraphMap.put("system", "poc系统");
         List<String[]> familyList = new ArrayList<>();
         List<String[]> familyList1 = new ArrayList<>();
-        Map<String,List<String[]>> familyListMap = new HashMap<>();
+        Map<String, List<String[]>> familyListMap = new HashMap<>();
         familyList.add(new String[]{"露娜", "女", "野友", "666", "6660"});
         familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
         familyList.add(new String[]{"貂蝉", "女", "法友", "888", "8880"});
         familyList1.add(new String[]{"露娜1", "女", "野友", "666", "6660"});
         familyList1.add(new String[]{"貂蝉1", "女", "法友", "888", "8880"});
-        familyListMap.put("tl0",familyList);
-        familyListMap.put("tl1",familyList1);
-        writeDocument("D:\\Desktop\\poc\\template\\template.docx",paragraphMap,familyListMap);
+        familyListMap.put("tl0", familyList);
+        familyListMap.put("tl1", familyList1);
+        writeDocument("D:\\Desktop\\poc\\template\\template.docx", paragraphMap, familyListMap);
     }
 
     /**
      * 输出文件
-     * @param templatePath 模板路径
-     * @param paragraphMap 文档中数据集合
+     *
+     * @param templatePath  模板路径
+     * @param paragraphMap  文档中数据集合
      * @param familyListMap 表格信息
      */
-    public static void writeDocument(String templatePath,Map<String,String> paragraphMap,Map<String,List<String[]>> familyListMap){
+    public static void writeDocument(String templatePath, Map<String, String> paragraphMap, Map<String, List<String[]>> familyListMap) {
         File file = new File(templatePath);
         InputStream inputStream = null;
         try {
@@ -49,7 +52,7 @@ public class RadeWord {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        byte[] a = exportWord(inputStream,paragraphMap,familyListMap);
+        byte[] a = exportWord(inputStream, paragraphMap, familyListMap);
         InputStream sbs = new ByteArrayInputStream(a);
         byteToFile(a, "D:\\Desktop\\个人\\test", "zzz.docx");
         Runtime run = Runtime.getRuntime();
@@ -65,19 +68,21 @@ public class RadeWord {
             e.printStackTrace();
         }
     }
+
     /**
      * 替换word中文本
+     *
      * @param paragraphMap word中文本
      * @return
      */
-    public static byte[] exportWord(InputStream inputStream, Map<String, String> paragraphMap,Map<String,List<String[]>> familyListMap) {
+    public static byte[] exportWord(InputStream inputStream, Map<String, String> paragraphMap, Map<String, List<String[]>> familyListMap) {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         XWPFDocument document = null;
         try {
             //解析docx模板并获取document对象
             document = new XWPFDocument(inputStream);
             changeParagraphText(document, paragraphMap);
-            copyHeaderInsertText(document, familyListMap,0);
+            copyHeaderInsertText(document, familyListMap, 0);
             //copyActiveTable(document,familyListMap);
             document.write(byteOut);
         } catch (IOException e) {
@@ -97,11 +102,11 @@ public class RadeWord {
     /**
      * 替换表格对象方法
      *
-     * @param document    docx解析对象
+     * @param document   docx解析对象
      * @param textMapMap 需要替换的信息集合
      */
-    public static void changeTableText(XWPFDocument document, Map<String,Map<String, String>> textMapMap) {
-        if(textMapMap==null){
+    public static void changeTableText(XWPFDocument document, Map<String, Map<String, String>> textMapMap) {
+        if (textMapMap == null) {
             return;
         }
         //获取表格对象集合
@@ -113,11 +118,11 @@ public class RadeWord {
                 //判断表格是需要替换还是需要插入，判断逻辑有$为替换，表格无$为插入
                 if (checkText(table.getText())) {
                     List<XWPFTableRow> rows = table.getRows();
-                    if(textMapMap.get("tb"+i)==null){
+                    if (textMapMap.get("tb" + i) == null) {
                         break;
                     }
                     //遍历表格,并替换模板
-                    eachTable(rows, textMapMap.get("tb"+i));
+                    eachTable(rows, textMapMap.get("tb" + i));
                 }
             }
         }
@@ -126,11 +131,11 @@ public class RadeWord {
     /**
      * 复制表头 插入行数据，这里样式和表头一样
      *
-     * @param document      docx解析对象
+     * @param document     docx解析对象
      * @param tableListMap 需要插入数据集合
-     * @param headerIndex   表头的行索引，从0开始
+     * @param headerIndex  表头的行索引，从0开始
      */
-    public static void copyHeaderInsertText(XWPFDocument document, Map<String,List<String[]>> tableListMap, int headerIndex) {
+    public static void copyHeaderInsertText(XWPFDocument document, Map<String, List<String[]>> tableListMap, int headerIndex) {
         if (null == tableListMap) {
             return;
         }
@@ -139,7 +144,7 @@ public class RadeWord {
         List<String[]> tableList = new ArrayList<>();
         for (int h = 0; h < tables.size(); h++) {
             XWPFTable table = tables.get(h);
-            tableList = tableListMap.get("tl"+h);
+            tableList = tableListMap.get("tl" + h);
             XWPFTableRow copyRow = table.getRow(headerIndex);
             if (null == copyRow) {
                 break;
@@ -194,8 +199,7 @@ public class RadeWord {
     }
 
     /**
-     *
-     * @param document word文件
+     * @param document      word文件
      * @param activeListMap 传入数据
      */
     private static void copyActiveTable(XWPFDocument document, Map<String, List<String[]>> activeListMap) {
@@ -211,7 +215,7 @@ public class RadeWord {
             XmlCursor cursor = document.getParagraphs().get(31).getCTP().newCursor();
             XWPFTable newTable = document.insertNewTbl(cursor);
 
-            document.setTable(1,newTable);
+            document.setTable(1, newTable);
         }
     }
 
@@ -313,4 +317,36 @@ public class RadeWord {
         return check;
     }
 
+    /**
+     * 文件下载
+     * @param downPath 文件路径
+     * @throws Exception 异常抛出
+     */
+    public static void downFile(String downPath, HttpServletResponse response) throws Exception{
+        File file = new File(downPath);
+        // 获取文件名
+        String filename = file.getName();
+        // 获取文件后缀名
+        String ext = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+        // 将文件写入输入流
+        FileInputStream fileInputStream = new FileInputStream(file);
+        InputStream fis = new BufferedInputStream(fileInputStream);
+        byte[] buffer = new byte[fis.available()];
+        fis.read(buffer);
+        fis.close();
+        // 清空response
+        response.reset();
+        // 设置response的Header
+        response.setCharacterEncoding("UTF-8");
+        //Content-Disposition的作用：告知浏览器以何种方式显示响应返回的文件，用浏览器打开还是以附件的形式下载到本地保存
+        //attachment表示以附件方式下载   inline表示在线打开   "Content-Disposition: inline; filename=文件名.mp3"
+        // filename表示文件的默认名称，因为网络传输只支持URL编码的相关支付，因此需要将文件名URL编码后进行传输,前端收到后需要反编码才能获取到真正的名称
+        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
+        // 告知浏览器文件的大小
+        response.addHeader("Content-Length", "" + file.length());
+        OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+        response.setContentType("application/octet-stream");
+        outputStream.write(buffer);
+        outputStream.flush();
+    }
 }

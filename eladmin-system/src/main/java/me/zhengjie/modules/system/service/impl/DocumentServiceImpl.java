@@ -81,4 +81,9 @@ public class DocumentServiceImpl implements DocumentService {
     public void update(Document resources) {
 
     }
+
+    @Override
+    public List<Document> getList() {
+        return documentRepository.findAll();
+    }
 }

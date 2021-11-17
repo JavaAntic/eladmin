@@ -3,6 +3,7 @@ package me.zhengjie.util;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xwpf.usermodel.*;
 
 import java.io.*;
@@ -30,6 +31,7 @@ public class ReadWordCopy {
         // 段落内信息
         List<Run> runs;
     }
+
     /**
      * 表格信息
      */
@@ -44,6 +46,7 @@ public class ReadWordCopy {
         // 表格内行信息
         List<TableRow> rows;
     }
+
     /**
      * 文本信息
      */
@@ -54,16 +57,18 @@ public class ReadWordCopy {
         // 文本内容
         String text;
     }
+
     /**
      * 表格内行信息
      */
     @Data
-    public  static class TableRow {
+    public static class TableRow {
         // 位置
         int index;
         // 列集合
         List<TableCell> cells;
     }
+
     /**
      * 表格内列信息
      */
@@ -95,8 +100,8 @@ public class ReadWordCopy {
     public static void main(String[] args) {
         InputStream inputStream = null;
         //String templatePath = RadeWordCopy.class.getResource("/templates/test.docx").getPath();
-        //File templatePath = new File("D:\\Desktop\\poc\\CCCCFK-iOS应用安全测评报告（2021-08-23-14-27-41)_梆梆.docx");
-        File templatePath = new File("D:\\Desktop\\poc\\光大发卡_4.4.40_iOS应用安全检测报告_监管者_20210823222852_爱加密.docx");
+        File templatePath = new File("D:\\Desktop\\poc\\CCCCFK-iOS应用安全测评报告（2021-08-23-14-27-41)_梆梆.docx");
+        //File templatePath = new File("D:\\Desktop\\poc\\光大发卡_4.4.40_iOS应用安全检测报告_监管者_20210823222852_爱加密.docx");
         try {
             inputStream = new FileInputStream(templatePath);
         } catch (FileNotFoundException e) {
@@ -116,11 +121,13 @@ public class ReadWordCopy {
             in.close();
             process.waitFor();
         } catch (Exception e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
     }
+
     /**
      * 读取word主流程
+     *
      * @return
      */
     public static byte[] exportWord(InputStream inputStream) {
@@ -190,6 +197,7 @@ public class ReadWordCopy {
     /**
      * 获取文档中段落文本方法
      * 将段落信息封装到自建内部类,放到段落集合
+     *
      * @param document docx解析对象
      */
     public static void getParagraphText(XWPFDocument document) {
@@ -205,6 +213,7 @@ public class ReadWordCopy {
     /**
      * 获取表格内对象方法
      * 将表格内数据放入自建内部类集合
+     *
      * @param document docx解析对象
      */
     public static void getTableText(XWPFDocument document) {
@@ -219,7 +228,7 @@ public class ReadWordCopy {
             t.setIndex(i);
             t.setText(table.getText());
             t.setRows(rows);
-           tableList.add(t);
+            tableList.add(t);
         }
         System.out.println("----------------------------------------------------------------");
         System.out.println(JSONObject.toJSONString(tableList));
@@ -228,10 +237,11 @@ public class ReadWordCopy {
 
     /**
      * 读表格行信息
+     *
      * @param table 表格
      * @return 处理后的行
      */
-    private static List<TableRow> readRow(XWPFTable table){
+    private static List<TableRow> readRow(XWPFTable table) {
         int rowIndex = 0;
         List<TableRow> rows = new ArrayList<>();
         // 处理当前行
@@ -239,7 +249,7 @@ public class ReadWordCopy {
             TableRow row1 = new TableRow();
             List<TableCell> tCells = new ArrayList();
             List<XWPFTableCell> cells = row.getTableCells();
-            int cellIndex =0;
+            int cellIndex = 0;
             // 处理当前列
             for (XWPFTableCell cell : cells) {
                 TableCell cell1 = new TableCell();
@@ -259,30 +269,39 @@ public class ReadWordCopy {
 
     /**
      * 读段落信息
+     *
      * @param paragraphs 段落集合
      * @return 段落信息
      */
-    private static List<Paragraph> readParagraph (List<XWPFParagraph> paragraphs){
+    private static List<Paragraph> readParagraph(List<XWPFParagraph> paragraphs) {
         List<Paragraph> pList = new ArrayList();
         int index = 0;
         // 处理当前列里面的小段落.
         for (XWPFParagraph paragraph : paragraphs) {
-            Paragraph p = new Paragraph();
-            List<Run> runs = new ArrayList<>();
-            int runIndex =0;
-            for (XWPFRun run : paragraph.getRuns()) {
-                Run run1 = new Run();
-                run1.setIndex(runIndex);
-                run1.setText(run.toString());
-                runs.add(run1);
-                runIndex++;
+            if (!StringUtils.isEmpty(paragraph.getText())&&!StringUtils.isEmpty(paragraph.getText().replaceAll("(\\\r\\\n|\\\r|\\\n|\\\n\\\r)", ""))||!StringUtils.isEmpty(paragraph.getStyle())) {
+                Paragraph p = new Paragraph();
+                List<Run> runs = new ArrayList<>();
+                int runIndex = 0;
+                for (XWPFRun run : paragraph.getRuns()) {
+                    Run run1 = new Run();
+                    run1.setIndex(runIndex);
+                    run1.setText(run.toString());
+                    runs.add(run1);
+                    runIndex++;
+                }
+                p.setStyle(paragraph.getStyle());
+                p.setIndex(index);
+                p.setText(paragraph.getText());
+                p.setRuns(runs);
+                pList.add(p);
+            } else {
+                System.out.println(index);
             }
-            p.setStyle(paragraph.getStyle());
-            p.setIndex(index);
-            p.setText(paragraph.getText());
-            p.setRuns(runs);
-            pList.add(p);
             index++;
+            if(index==146){
+                System.out.println("asdasd");
+            }
+
         }
         return pList;
     }

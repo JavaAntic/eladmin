@@ -28,4 +28,6 @@ public interface DocumentService {
      * @param resources 文档
      */
     void update(Document resources);
+
+    Object getList();
 }
