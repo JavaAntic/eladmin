@@ -15,12 +15,12 @@ public interface DocumentService {
     /**
      * 上传
      *
-     * @param name     文档名称
-     * @param safeType 文档安全类型
-     * @param file     文件
+     * @param name    文档名称
+     * @param isModel 是否模板文件
+     * @param file    文件
      * @throws Exception /
      */
-    void upload(String name, String safeType, MultipartFile file) throws Exception;
+    void upload(String name, boolean isModel, MultipartFile file) throws Exception;
 
     /**
      * 修改文档

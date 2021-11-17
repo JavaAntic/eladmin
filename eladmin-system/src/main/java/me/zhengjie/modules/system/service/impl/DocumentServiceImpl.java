@@ -50,7 +50,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void upload(String name, String safeType, MultipartFile multipartFile) throws Exception {
+    public void upload(String name, boolean isModel, MultipartFile multipartFile) throws Exception {
         FileUtil.checkSize(properties.getMaxSize(), multipartFile.getSize());
         name = StringUtils.isBlank(name) ? FileUtil.getFileNameNoEx(multipartFile.getOriginalFilename()) : name;
         String suffix = FileUtil.getExtensionName(name);
@@ -62,18 +62,27 @@ public class DocumentServiceImpl implements DocumentService {
         if (StringUtils.isEmpty(suffix)) {
             throw new BadRequestException("文件类型不支持");
         }
-        try (InputStream inputStream = new FileInputStream(file)) {
-            // 读取word文件,转文件流
-            final Document document = new Document(name, FileTypeEnum.getType(suffix), safeType);
-            final DocumentDto documentDto = documentMapper.toDto(documentRepository.save(document));
-            DocumentUtils.exportWord(inputStream, documentDto);
-            final List<DocumentParagraph> documentParagraphs = documentParagraphMapper.toEntity(DocumentUtils.getParagraphList());
-            documentParagraphRepository.saveAll(documentParagraphs);
-            final List<DocumentTable> documentTables = documentTableMapper.toEntity(DocumentUtils.getTableList());
-            documentTableRepository.saveAll(documentTables);
-        } catch (Exception e) {
-            FileUtil.del(file);
-            throw e;
+        if (!isModel) {
+            final String substring = name.substring(0, name.indexOf("."));
+            final String[] split = substring.split("_");
+            String safeType = split[split.length - 1];
+            final List<String> safeTypeList = properties.getSafeType();
+            if (!safeTypeList.contains(safeType)) {
+                throw new BadRequestException("文件名不符合规则：解析安全类型失败！");
+            }
+            try (InputStream inputStream = new FileInputStream(file)) {
+                // 读取word文件,转文件流
+                final Document document = new Document(name, FileTypeEnum.getType(suffix), safeType);
+                final DocumentDto documentDto = documentMapper.toDto(documentRepository.save(document));
+                DocumentUtils.exportWord(inputStream, documentDto);
+                final List<DocumentParagraph> documentParagraphs = documentParagraphMapper.toEntity(DocumentUtils.getParagraphList());
+                documentParagraphRepository.saveAll(documentParagraphs);
+                final List<DocumentTable> documentTables = documentTableMapper.toEntity(DocumentUtils.getTableList());
+                documentTableRepository.saveAll(documentTables);
+            } catch (Exception e) {
+                FileUtil.del(file);
+                throw e;
+            }
         }
     }
 

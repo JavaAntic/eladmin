@@ -20,6 +20,8 @@ import me.zhengjie.utils.ElAdminConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 /**
  * @author Zheng Jie
  */
@@ -39,6 +41,8 @@ public class FileProperties {
     private ElPath linux;
 
     private ElPath windows;
+
+    private List<String> safeType;
 
     public ElPath getPath(){
         String os = System.getProperty("os.name");
