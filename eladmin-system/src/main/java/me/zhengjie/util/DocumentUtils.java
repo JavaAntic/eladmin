@@ -5,6 +5,7 @@ import me.zhengjie.modules.system.service.dto.DocumentParagraphDto;
 import me.zhengjie.modules.system.service.dto.DocumentParagraphRunDto;
 import me.zhengjie.modules.system.service.dto.DocumentTableCellDto;
 import me.zhengjie.modules.system.service.dto.DocumentTableDto;
+import me.zhengjie.modules.system.service.dto.DocumentTableParagraphDto;
 import me.zhengjie.modules.system.service.dto.DocumentTableRowDto;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -65,9 +66,7 @@ public class DocumentUtils {
      */
     private static void getParagraphText(XWPFDocument document, DocumentDto documentDto) {
         //获取段落集合
-        List<XWPFParagraph> paragraphs = document.getParagraphs();
-        List<DocumentParagraphDto> pList = readParagraph(paragraphs, documentDto);
-        paragraphList.addAll(pList);
+        paragraphList.addAll(readParagraph(document.getParagraphs(), documentDto));
     }
 
     /**
@@ -83,12 +82,11 @@ public class DocumentUtils {
             XWPFTable table = tables.get(i);
             DocumentTableDto t = new DocumentTableDto();
             // 处理表格行
-            List<DocumentTableRowDto> rows = readRow(table, documentDto);
             t.setDocument(documentDto);
             t.setDataSize(table.getNumberOfRows());
             t.setIndex(i);
             t.setText(table.getText());
-            t.setRows(rows);
+            t.setRows(readRow(table));
             tableList.add(t);
         }
     }
@@ -99,7 +97,7 @@ public class DocumentUtils {
      * @param table 表格
      * @return 处理后的行
      */
-    private static List<DocumentTableRowDto> readRow(XWPFTable table, DocumentDto documentDto) {
+    private static List<DocumentTableRowDto> readRow(XWPFTable table) {
         int rowIndex = 0;
         List<DocumentTableRowDto> rows = new ArrayList<>();
         // 处理当前行
@@ -111,8 +109,7 @@ public class DocumentUtils {
             // 处理当前列
             for (XWPFTableCell cell : cells) {
                 DocumentTableCellDto cell1 = new DocumentTableCellDto();
-                List<DocumentParagraphDto> pList = readParagraph(cell.getParagraphs(), documentDto);
-                cell1.setParagraphs(pList);
+                cell1.setParagraphs(readTableParagraph(cell.getParagraphs()));
                 cell1.setIndex(cellIndex);
                 tCells.add(cell1);
                 cellIndex++;
@@ -137,23 +134,49 @@ public class DocumentUtils {
         // 处理当前列里面的小段落.
         for (XWPFParagraph paragraph : paragraphs) {
             DocumentParagraphDto p = new DocumentParagraphDto();
-            List<DocumentParagraphRunDto> runs = new ArrayList<>();
-            int runIndex = 0;
-            for (XWPFRun run : paragraph.getRuns()) {
-                DocumentParagraphRunDto run1 = new DocumentParagraphRunDto();
-                run1.setIndex(runIndex);
-                run1.setText(run.toString());
-                runs.add(run1);
-                runIndex++;
-            }
             p.setDocument(documentDto);
             p.setStyle(paragraph.getStyle());
             p.setIndex(index);
             p.setText(paragraph.getText());
-            p.setRuns(runs);
+            p.setRuns(getDocumentParagraphRun(paragraph));
             pList.add(p);
             index++;
         }
         return pList;
+    }
+
+    /**
+     * 读段落信息
+     *
+     * @param paragraphs 段落集合
+     * @return 段落信息
+     */
+    private static List<DocumentTableParagraphDto> readTableParagraph(List<XWPFParagraph> paragraphs) {
+        List<DocumentTableParagraphDto> pList = new ArrayList<>();
+        int index = 0;
+        // 处理当前列里面的小段落.
+        for (XWPFParagraph paragraph : paragraphs) {
+            DocumentTableParagraphDto p = new DocumentTableParagraphDto();
+            p.setStyle(paragraph.getStyle());
+            p.setIndex(index);
+            p.setText(paragraph.getText());
+            p.setRuns(getDocumentParagraphRun(paragraph));
+            pList.add(p);
+            index++;
+        }
+        return pList;
+    }
+
+    private static List<DocumentParagraphRunDto> getDocumentParagraphRun(XWPFParagraph paragraph) {
+        List<DocumentParagraphRunDto> runs = new ArrayList<>();
+        int runIndex = 0;
+        for (XWPFRun run : paragraph.getRuns()) {
+            DocumentParagraphRunDto run1 = new DocumentParagraphRunDto();
+            run1.setIndex(runIndex);
+            run1.setText(run.toString());
+            runs.add(run1);
+            runIndex++;
+        }
+        return runs;
     }
 }
