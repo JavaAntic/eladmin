@@ -26,52 +26,21 @@ public class RadeWord {
         List<String[]> familyList1 = new ArrayList<>();
         Map<String,List<String[]>> familyListMap = new HashMap<>();
         familyList.add(new String[]{"露娜", "女", "野友", "666", "6660"});
-        familyList.add(new String[]{"鲁班", "男", "射友", "222", "2220"});
-        familyList.add(new String[]{"程咬金", "男", "肉友", "999", "9990"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
         familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
         familyList.add(new String[]{"貂蝉", "女", "法友", "888", "8880"});
         familyList1.add(new String[]{"露娜1", "女", "野友", "666", "6660"});
-        familyList1.add(new String[]{"鲁班1", "男", "射友", "222", "2220"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"程咬金1", "男", "肉友", "999", "9990"});
-        familyList1.add(new String[]{"太乙真人1", "男", "辅友", "111", "1110"});
         familyList1.add(new String[]{"貂蝉1", "女", "法友", "888", "8880"});
         familyListMap.put("tl0",familyList);
         familyListMap.put("tl1",familyList1);
         writeDocument("D:\\Desktop\\poc\\template\\template.docx",paragraphMap,familyListMap);
     }
+
+    /**
+     * 输出文件
+     * @param templatePath 模板路径
+     * @param paragraphMap 文档中数据集合
+     * @param familyListMap 表格信息
+     */
     public static void writeDocument(String templatePath,Map<String,String> paragraphMap,Map<String,List<String[]>> familyListMap){
         File file = new File(templatePath);
         InputStream inputStream = null;
