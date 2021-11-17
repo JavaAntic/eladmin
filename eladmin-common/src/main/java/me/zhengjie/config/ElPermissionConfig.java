@@ -17,8 +17,10 @@ package me.zhengjie.config;
 
 import me.zhengjie.utils.SecurityUtils;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
