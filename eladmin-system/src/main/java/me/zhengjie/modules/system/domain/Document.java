@@ -1,7 +1,7 @@
 package me.zhengjie.modules.system.domain;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import me.zhengjie.base.BaseEntity;
@@ -25,7 +25,6 @@ import java.util.Objects;
  * @since 1.0.0
  */
 @Entity
-@Builder
 @Getter
 @Setter
 @Table(name = "ST_DOCUMENT")
@@ -50,6 +49,12 @@ public class Document extends BaseEntity implements Serializable {
     @NotBlank
     @ApiModelProperty(value = "文件名称")
     private String fileName;
+
+    public Document(@NotBlank String fileName, @NotBlank String fileType, @NotBlank String safeType) {
+        this.fileType = fileType;
+        this.safeType = safeType;
+        this.fileName = fileName;
+    }
 
     @Override
     public boolean equals(Object o) {

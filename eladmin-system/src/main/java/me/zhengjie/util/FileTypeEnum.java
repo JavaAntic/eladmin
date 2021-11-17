@@ -41,7 +41,7 @@ public enum FileTypeEnum {
                 code = PDF.getCode();
                 break;
             case "doc":
-            case "dcox":
+            case "docx":
                 code = WORD.getCode();
                 break;
             case "xls":
