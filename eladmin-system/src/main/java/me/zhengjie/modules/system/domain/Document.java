@@ -50,6 +50,9 @@ public class Document extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "文件名称")
     private String fileName;
 
+    public Document() {
+    }
+
     public Document(@NotBlank String fileName, @NotBlank String fileType, @NotBlank String safeType) {
         this.fileType = fileType;
         this.safeType = safeType;
