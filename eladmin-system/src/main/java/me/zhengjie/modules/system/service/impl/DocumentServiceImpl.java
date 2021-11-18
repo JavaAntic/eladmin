@@ -18,6 +18,8 @@ import me.zhengjie.modules.system.service.mapstruct.DocumentMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentParagraphMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentTableMapper;
 import me.zhengjie.util.DocumentUtils;
+import me.zhengjie.util.FileTypeEnum;
+import me.zhengjie.util.SafeTypeEnum;
 import me.zhengjie.utils.FileUtil;
 import me.zhengjie.utils.StringUtils;
 import org.springframework.cache.annotation.CacheConfig;
@@ -25,8 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,7 +51,8 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentParagraphMapper documentParagraphMapper;
     private final DocumentTableMapper documentTableMapper;
     private final FileProperties properties;
-
+    @Value("${upload.filePath}")
+    public String filePath;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void upload(String name, Boolean isModel, MultipartFile multipartFile) throws Exception {
@@ -181,7 +182,43 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> getList() {
-        return documentRepository.findAll();
+    public List<Document> getList(DocumentVo vo) {
+        Specification<Document> spec = (root, query, cb) -> {
+            return cb.and(cb.equal(root.get("doc_type").as(String.class), vo.getDocType()));
+        };
+        return documentRepository.findAll(spec);
+    }
+
+    @Override
+    public List<Document> create(DocumentVo vo) {
+        String fileName = "ZDY"+System.currentTimeMillis();
+        String path = filePath +"/ZDY/"+fileName+".docx";
+        // 生成文档首页信息
+        Map<String, String> paragraphMap = new HashMap<>();
+        paragraphMap.put("head", vo.getHead());
+        paragraphMap.put("fileName", fileName);
+        paragraphMap.put("time", LocalDate.now().toString());
+        paragraphMap.put("system", "poc");
+
+        // 生成文档表格数据
+        List<String[]> familyList = new ArrayList<>();
+        List<String[]> familyList1 = new ArrayList<>();
+        Map<String, List<String[]>> familyListMap = new HashMap<>();
+        familyList.add(new String[]{"露娜", "女", "野友", "666", "6660"});
+        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
+        familyList.add(new String[]{"貂蝉", "女", "法友", "888", "8880"});
+        familyList1.add(new String[]{"露娜1", "女", "野友", "666", "6660"});
+        familyList1.add(new String[]{"貂蝉1", "女", "法友", "888", "8880"});
+        familyListMap.put("tl0", familyList);
+        familyListMap.put("tl1", familyList1);
+        ReadWord.writeDocument(path,paragraphMap,familyListMap);
+       // 将该文件进行保存
+        return null;
+    }
+    @Override
+    public List<Document> addList(DocumentVo vo) {
+        // 1.取得文件信息
+        // 2.将关联信息查出来返回前端
+        return null;
     }
 }

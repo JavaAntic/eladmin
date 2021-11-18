@@ -1,6 +1,7 @@
 package me.zhengjie.modules.system.service;
 
 import me.zhengjie.modules.system.domain.Document;
+import me.zhengjie.modules.system.domain.vo.DocumentVo;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -29,5 +30,9 @@ public interface DocumentService {
      */
     void update(Document resources);
 
-    Object getList();
+    Object getList(DocumentVo vo);
+
+    Object create(DocumentVo vo);
+
+    Object addList(DocumentVo vo);
 }
