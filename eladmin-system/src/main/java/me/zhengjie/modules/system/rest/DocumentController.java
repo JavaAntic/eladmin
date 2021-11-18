@@ -50,9 +50,9 @@ public class DocumentController {
 
     @Log("安全工具报告列表")
     @ApiOperation("安全工具报告列表")
-    @GetMapping("/documentList")
+    @GetMapping
     @PreAuthorize("@el.check('doc:list')")
-    public ResponseEntity<Object> documentList(@Param("docType") String type){
+    public ResponseEntity<Object> query(@Param("docType") String type){
 
         return new ResponseEntity<>(documentService.getList(type),HttpStatus.OK);
     }
