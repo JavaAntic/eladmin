@@ -57,8 +57,8 @@ public class DocumentController {
         }
         return new ResponseEntity<>(documentService.getList(vo),HttpStatus.OK);
     }
-    @Log("下载生成文件")
-    @ApiOperation("下载生成文件")
+    @Log("生成文件")
+    @ApiOperation("生成文件")
     @PostMapping("/create")
     @PreAuthorize("@el.check('doc:create')")
     public ResponseEntity<Object> create(@RequestBody DocumentVo vo){

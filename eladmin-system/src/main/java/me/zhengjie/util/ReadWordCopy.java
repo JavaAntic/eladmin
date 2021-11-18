@@ -280,6 +280,7 @@ public class ReadWordCopy {
         for (XWPFParagraph paragraph : paragraphs) {
             if (!StringUtils.isEmpty(paragraph.getText())&&!StringUtils.isEmpty(paragraph.getText().replaceAll("(\\\r\\\n|\\\r|\\\n|\\\n\\\r)", ""))||!StringUtils.isEmpty(paragraph.getStyle())) {
                 Paragraph p = new Paragraph();
+
                 List<Run> runs = new ArrayList<>();
                 int runIndex = 0;
                 for (XWPFRun run : paragraph.getRuns()) {
