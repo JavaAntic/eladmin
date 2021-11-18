@@ -3,20 +3,15 @@ package me.zhengjie.modules.system.rest;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import me.zhengjie.util.RadeWord;
+import me.zhengjie.util.ReadWord;
 import me.zhengjie.util.ReadWordCopy;
-import net.bytebuddy.implementation.bytecode.Throw;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLEncoder;
 import java.util.List;
-
-import static com.spire.pdf.security.SignatureConfigureText.Date;
 
 /**
  * ReadDocumentController
@@ -94,7 +89,7 @@ public class ReadDocumentController {
     public void download(@RequestParam("path") String path, HttpServletResponse response) {
         System.out.println(path);
         try {
-            RadeWord.downFile(filePath + path,response);
+            ReadWord.downFile(filePath + path,response);
         } catch (Exception e) {
             e.printStackTrace();
             new Exception( "下载失败，原因:"+e.getMessage());
@@ -110,7 +105,7 @@ public class ReadDocumentController {
     public void downloadBaseTemplate(HttpServletResponse response) {
         String path = "/baseTemplate/baseTemplate.docx";
         try {
-            RadeWord.downFile(filePath + path, response);
+            ReadWord.downFile(filePath + path, response);
         } catch (Exception e) {
             e.printStackTrace();
             new Exception("下载失败，原因:" + e.getMessage());

@@ -11,11 +11,11 @@ import java.net.URLEncoder;
 import java.util.*;
 
 /**
- * @description: RadeWord
+ * @description: ReadWord
  * @date: 2021/3/31
  * @author: 王瑾
  */
-public class RadeWord {
+public class ReadWord {
 
     public static void main(String[] args) {
         // 模拟点数据

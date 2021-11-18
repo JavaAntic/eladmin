@@ -15,9 +15,11 @@ import java.util.List;
 @Data
 public class DocumentVo {
 
-    @ApiModelProperty(value = " 1:工具报告 2自定义报告3模板")
-    private String documentType;
+    @ApiModelProperty(value = "0:上传文件 1:自定义 2:模板文件")
+    private String docType;
 
     @ApiModelProperty(value = "段落")
     private List<String> paragraphIds;
+   // 文档头
+    private String head;
 }

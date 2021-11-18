@@ -57,7 +57,7 @@ public class DocumentController {
     @PostMapping("/documentList")
     @PreAuthorize("@el.check('doc:list')")
     public ResponseEntity<Object> documentList(@RequestBody DocumentVo vo){
-        if (StringUtils.isEmpty(vo.getDocumentType())){
+        if (StringUtils.isEmpty(vo.getDocType())){
             return new ResponseEntity<>("文档类型不能为空",HttpStatus.OK);
         }
         return new ResponseEntity<>(documentService.getList(vo),HttpStatus.OK);
