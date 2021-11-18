@@ -24,4 +24,10 @@ public class DocumentDto extends BaseDTO implements Serializable {
     private String safeType;
 
     private String fileName;
+
+    private String filePath;
+
+    private String docNum;
+
+    private String docType;
 }

@@ -18,8 +18,6 @@ import me.zhengjie.modules.system.service.mapstruct.DocumentMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentParagraphMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentTableMapper;
 import me.zhengjie.util.DocumentUtils;
-import me.zhengjie.util.FileTypeEnum;
-import me.zhengjie.util.SafeTypeEnum;
 import me.zhengjie.utils.FileUtil;
 import me.zhengjie.utils.StringUtils;
 import org.springframework.cache.annotation.CacheConfig;
@@ -27,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -54,86 +54,125 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void upload(String name, boolean isModel, MultipartFile multipartFile) throws Exception {
+    public void upload(String name, Boolean isModel, MultipartFile multipartFile) throws Exception {
         FileUtil.checkSize(properties.getMaxSize(), multipartFile.getSize());
-        name = StringUtils.isBlank(name) ? FileUtil.getFileNameNoEx(multipartFile.getOriginalFilename()) : name;
-        String suffix = FileUtil.getExtensionName(name);
-        String type = FileUtil.getFileType(suffix);
+        name = StringUtils.isBlank(name) ? multipartFile.getOriginalFilename() : name;
+        if (StringUtils.isEmpty(name)) {
+            throw new BadRequestException("文件名不能为空");
+        }
+        if (ObjectUtil.isNull(isModel)) {
+            throw new BadRequestException("是否模板属性不能为空");
+        }
         if (ObjectUtil.isNull(multipartFile)) {
             throw new BadRequestException("上传失败");
         }
-        if (StringUtils.isEmpty(suffix)) {
-            throw new BadRequestException("文件类型不支持");
+        String suffix = FileUtil.getExtensionName(name);
+        final List<String> fileTypeList = properties.getFileType();
+        if (StringUtils.isEmpty(suffix) || !fileTypeList.contains(suffix)) {
+            throw new BadRequestException("文件类型[" + suffix + "]不支持");
         }
-        final String docType = FileTypeEnum.getType(suffix);
-        File file = saveDocument(multipartFile, type, docType);
+        final String fileNameNoEx = FileUtil.getFileNameNoEx(name);
+        final String regex = "_";
+        if (!fileNameNoEx.contains(regex)) {
+            throw new BadRequestException("文件名不符合规则：安全类型不存在");
+        }
+        final String[] split = fileNameNoEx.split(regex);
+        String subName = split[split.length - 1];
+        final List<String> safeTypeList = properties.getSafeType();
+        if (StringUtils.isEmpty(subName) || !safeTypeList.contains(subName)) {
+            throw new BadRequestException("未知安全类型：" + subName);
+        }
+        saveDocument(name, isModel, multipartFile, suffix, fileTypeList, subName, safeTypeList);
+    }
+
+    /**
+     * 文档保存本地磁盘
+     *
+     * @param name          文件名
+     * @param isModel       是否模板
+     * @param multipartFile 媒体文件
+     * @param suffix        文件后缀
+     * @param fileTypeList  文件类型列表
+     * @param subName       文件名截取
+     * @param safeTypeList  安全类型列表
+     * @throws Exception /
+     */
+    private void saveDocument(String name, Boolean isModel, MultipartFile multipartFile, String suffix,
+                              List<String> fileTypeList, String subName, List<String> safeTypeList) throws Exception {
+        String type = FileUtil.getFileType(suffix);
+        final String filePath = properties.getPath().getPath() + type + File.separator;
+        // 保存文件到本地磁盘
+        File file = FileUtil.upload(multipartFile, filePath);
+        if (file == null || !file.isFile()) {
+            throw new Exception("文件保存失败");
+        }
+        String docType = !isModel ? "0" : "2";
+        final int fileTypeIndex = fileTypeList.indexOf(suffix);
+        final String fileType = String.valueOf(fileTypeIndex);
+        final String safeType = String.valueOf(safeTypeList.indexOf(subName));
+        final Document first = documentRepository.findFirstByDocTypeOrderByDocNumDesc(docType);
+        int docNum;
+        if (first == null) {
+            docNum = 1;
+        } else {
+            docNum = first.getDocNum() + 1;
+        }
+        final Document document = new Document(name, fileType, safeType, file.getAbsolutePath(), docNum, docType);
+//        try {
+        final Document save = documentRepository.save(document);
         if (!isModel) {
-            parseDocument(name, docType, file);
+            parseDocument(fileTypeIndex, file, save);
+        }
+//        } catch (Exception e) {
+//            FileUtil.del(file);
+//            throw e;
+//        }
+    }
+
+    /**
+     * 解析非模板文档
+     *
+     * @param fileType 文件类型 0:word 1:pdf 2:excel
+     * @param file     本地磁盘文件
+     * @param save     保存数据库的文档信息
+     * @throws IOException /
+     */
+    private void parseDocument(int fileType, File file, Document save) throws IOException {
+        // 文档类型为PDF
+        if (fileType == 1) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            // PDF 转 WORD
+            PdfDocument pdf = new PdfDocument();
+            //Load a PDF file
+            pdf.loadFromFile(file.getAbsolutePath(), FileFormat.PDF);
+            //Save to .docx file
+            pdf.saveToStream(baos, FileFormat.DOCX);
+            pdf.close();
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
+                parseDocument(save, bais);
+            }
+        } else {
+            try (InputStream inputStream = new FileInputStream(file)) {
+                parseDocument(save, inputStream);
+            }
         }
     }
 
     /**
      * 解析非模板文档
      *
-     * @param name    文件名
-     * @param docType 文档类型
-     * @param file    文档文件
-     * @throws Exception /
-     */
-    private void parseDocument(String name, String docType, File file) throws Exception {
-        final String substring = name.substring(0, name.lastIndexOf("."));
-        final String[] split = substring.split("_");
-        String safeType = split[split.length - 1];
-        final List<String> safeTypeList = properties.getSafeType();
-        if (!safeTypeList.contains(safeType)) {
-            throw new BadRequestException("文件名不符合规则：解析安全类型失败！");
-        }
-        try (InputStream inputStream = new FileInputStream(file)) {
-            // 读取word文件,转文件流
-            final Document document = new Document(name, docType, SafeTypeEnum.getType(safeType));
-            final DocumentDto documentDto = documentMapper.toDto(documentRepository.save(document));
-            DocumentUtils.exportWord(inputStream, documentDto);
-            final List<DocumentParagraph> documentParagraphs = documentParagraphMapper.toEntity(DocumentUtils.getParagraphList());
-            documentParagraphRepository.saveAll(documentParagraphs);
-            final List<DocumentTable> documentTables = documentTableMapper.toEntity(DocumentUtils.getTableList());
-            documentTableRepository.saveAll(documentTables);
-        } catch (Exception e) {
-            FileUtil.del(file);
-            throw e;
-        }
-    }
-
-    /**
-     * 文档保存本地磁盘
-     * pdf：转word再保存
-     * word直接保存
-     *
-     * @param multipartFile 媒体文件
-     * @param type          文件类型
-     * @param docType       文档类型
-     * @return 本地文件
+     * @param save        保存数据库的文档信息
+     * @param inputStream 文档输入流
      * @throws IOException /
      */
-    private File saveDocument(MultipartFile multipartFile, String type, String docType) throws IOException {
-        File file;
-        final String filePath = properties.getPath().getPath() + type + File.separator;
-        if (FileTypeEnum.PDF.getCode().equals(docType)) {
-            // PDF 转 WORD
-            try (InputStream inputStream = multipartFile.getInputStream()) {
-                final String absFilename = filePath + FileUtil.generateFileName(multipartFile, FileFormat.DOCX.getName().toLowerCase());
-                PdfDocument pdf = new PdfDocument();
-                //Load a PDF file
-                pdf.loadFromStream(inputStream);
-                //Save to .docx file
-                pdf.saveToFile(absFilename, FileFormat.DOCX);
-                pdf.close();
-                file = new File(absFilename);
-            }
-        } else {
-            // 保存文件到本地磁盘
-            file = FileUtil.upload(multipartFile, filePath);
-        }
-        return file;
+    private void parseDocument(Document save, InputStream inputStream) throws IOException {
+        // 读取word文件,转文件流
+        final DocumentDto documentDto = documentMapper.toDto(save);
+        DocumentUtils.exportWord(inputStream, documentDto);
+        final List<DocumentParagraph> documentParagraphs = documentParagraphMapper.toEntity(DocumentUtils.getParagraphList());
+        documentParagraphRepository.saveAll(documentParagraphs);
+        final List<DocumentTable> documentTables = documentTableMapper.toEntity(DocumentUtils.getTableList());
+        documentTableRepository.saveAll(documentTables);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class DocumentController {
     @ApiOperation("上传文件")
     @PostMapping
     @PreAuthorize("@el.check('doc:upload')")
-    public ResponseEntity<Object> upload(@RequestParam String name, @RequestParam boolean isModel, @RequestParam("file") MultipartFile file) throws Exception {
+    public ResponseEntity<Object> upload(@RequestParam String name, @RequestParam Boolean isModel, @RequestParam("file") MultipartFile file) throws Exception {
         documentService.upload(name, isModel, file);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

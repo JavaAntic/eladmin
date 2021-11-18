@@ -3,6 +3,10 @@ package me.zhengjie.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.spire.ms.System.Collections.ArrayList;
+import lombok.RequiredArgsConstructor;
+import me.zhengjie.config.FileProperties;
+import me.zhengjie.modules.system.domain.Document;
+import me.zhengjie.modules.system.repository.DocumentRepository;
 import me.zhengjie.utils.StringUtils;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
@@ -19,8 +23,13 @@ import java.util.Objects;
  * @since 1.0.0
  */
 @Component
+@RequiredArgsConstructor
 @Named("TypeConversionWorker")
 public class TypeConversionWorker {
+
+    private final DocumentRepository documentRepository;
+    private final FileProperties properties;
+
     /**
      * 对象转json字符串
      *
@@ -33,6 +42,31 @@ public class TypeConversionWorker {
             return null;
         }
         return JacksonUtil.toJsonString(obj);
+    }
+
+    @Named("docNum2String")
+    public String docNum2String(Integer docNum, String docType) {
+        final Document first = documentRepository.findFirstByDocTypeOrderByDocNumDesc(docType);
+        final List<String> docNumPrefix = properties.getDocNumPrefix();
+        final String prefix = docNumPrefix.get(Integer.parseInt(docType));
+        String strDocNum;
+        if (first != null) {
+            final int targetLen = String.valueOf(first.getDocNum()).length();
+            final int sourceLen = String.valueOf(docNum).length();
+            String format = "%0" + (targetLen - sourceLen) + "d";
+            strDocNum = prefix + String.format(format, docNum);
+        } else {
+            strDocNum = prefix + docNum;
+        }
+        return strDocNum;
+    }
+
+    @Named("docNum2Integer")
+    public Integer docNum2Integer(String docNum, String docType) {
+        final List<String> docNumPrefix = properties.getDocNumPrefix();
+        final String prefix = docNumPrefix.get(Integer.parseInt(docType));
+        final String strDocNum = docNum.substring(prefix.length());
+        return Integer.parseInt(strDocNum);
     }
 
     /**

@@ -20,7 +20,7 @@ public interface DocumentService {
      * @param file    文件
      * @throws Exception /
      */
-    void upload(String name, boolean isModel, MultipartFile file) throws Exception;
+    void upload(String name, Boolean isModel, MultipartFile file) throws Exception;
 
     /**
      * 修改文档

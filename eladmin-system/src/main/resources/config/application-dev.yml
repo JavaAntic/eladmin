@@ -120,3 +120,11 @@ file:
     - 通付盾
     - 梆梆
     - 爱加密
+  fileType:
+    - word
+    - pdf
+    - excel
+  docNumPrefix:
+    - DOC
+    - ZDY
+    - MB

@@ -50,13 +50,28 @@ public class Document extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "文件名称")
     private String fileName;
 
+    @NotBlank
+    @ApiModelProperty(value = "文件路径")
+    private String filePath;
+
+    @NotNull
+    @ApiModelProperty(value = "文档编号")
+    private Integer docNum;
+
+    @NotBlank
+    @ApiModelProperty(value = "文档类型 0:上传文件 1:自定义 2:模板文件")
+    private String docType;
+
     public Document() {
     }
 
-    public Document(@NotBlank String fileName, @NotBlank String fileType, @NotBlank String safeType) {
+    public Document(@NotBlank String fileName, @NotBlank String fileType, @NotBlank String safeType, @NotBlank String filePath, @NotBlank Integer docNum, @NotBlank String docType) {
         this.fileType = fileType;
         this.safeType = safeType;
         this.fileName = fileName;
+        this.filePath = filePath;
+        this.docNum = docNum;
+        this.docType = docType;
     }
 
     @Override
@@ -71,11 +86,14 @@ public class Document extends BaseEntity implements Serializable {
         return Objects.equals(id, document.id) &&
                 Objects.equals(fileType, document.fileType) &&
                 Objects.equals(safeType, document.safeType) &&
-                Objects.equals(fileName, document.fileName);
+                Objects.equals(fileName, document.fileName) &&
+                Objects.equals(filePath, document.filePath) &&
+                Objects.equals(docNum, document.docNum) &&
+                Objects.equals(docType, document.docType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fileType, safeType, fileName);
+        return Objects.hash(id, fileType, safeType, fileName, filePath, docNum, docType);
     }
 }

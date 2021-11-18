@@ -44,6 +44,10 @@ public class FileProperties {
 
     private List<String> safeType;
 
+    private List<String> fileType;
+
+    private List<String> docNumPrefix;
+
     public ElPath getPath(){
         String os = System.getProperty("os.name");
         if(os.toLowerCase().startsWith(ElAdminConstant.WIN)) {
