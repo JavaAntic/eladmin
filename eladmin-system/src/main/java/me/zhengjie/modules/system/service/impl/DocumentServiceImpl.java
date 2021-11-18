@@ -9,6 +9,7 @@ import me.zhengjie.exception.BadRequestException;
 import me.zhengjie.modules.system.domain.Document;
 import me.zhengjie.modules.system.domain.DocumentParagraph;
 import me.zhengjie.modules.system.domain.DocumentTable;
+import me.zhengjie.modules.system.domain.vo.DocumentVo;
 import me.zhengjie.modules.system.repository.DocumentParagraphRepository;
 import me.zhengjie.modules.system.repository.DocumentRepository;
 import me.zhengjie.modules.system.repository.DocumentTableRepository;
@@ -23,6 +24,7 @@ import me.zhengjie.util.SafeTypeEnum;
 import me.zhengjie.utils.FileUtil;
 import me.zhengjie.utils.StringUtils;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +33,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -142,7 +145,10 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> getList() {
-        return documentRepository.findAll();
+    public List<Document> getList(DocumentVo vo) {
+        Specification<Document> spec = (root, query, cb) -> {
+            return cb.and(cb.equal(root.get("document_type").as(String.class), vo.getDocumentType()));
+        };
+        return documentRepository.findAll(spec);
     }
 }

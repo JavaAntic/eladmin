@@ -51,10 +51,11 @@ public class DocumentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Log("安全工具报告列表")
     @ApiOperation("安全工具报告列表")
     @PostMapping("/documentList")
-    //@PreAuthorize("@el.check('doc:upload')")
+    @PreAuthorize("@el.check('doc:upload')")
     public ResponseEntity<Object> documentList(@RequestBody DocumentVo vo){
-        return new ResponseEntity<>(documentService.getList(),HttpStatus.OK);
+        return new ResponseEntity<>(documentService.getList(vo),HttpStatus.OK);
     }
 }
