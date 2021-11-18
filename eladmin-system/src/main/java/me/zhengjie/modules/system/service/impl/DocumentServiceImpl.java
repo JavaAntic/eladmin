@@ -190,9 +190,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> getList(DocumentVo vo) {
+    public List<Document> getList(String docType) {
         Specification<Document> spec = (root, query, cb) -> {
-            return cb.and(cb.equal(root.get("docType").as(String.class), vo.getDocType()));
+            return cb.and(cb.equal(root.get("docType").as(String.class), docType));
         };
         return documentRepository.findAll(spec);
     }

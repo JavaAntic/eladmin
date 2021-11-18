@@ -9,6 +9,7 @@ import me.zhengjie.modules.system.service.DocumentService;
 import me.zhengjie.modules.system.domain.vo.DocumentVo;
 import me.zhengjie.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,11 +52,9 @@ public class DocumentController {
     @ApiOperation("安全工具报告列表")
     @GetMapping("/documentList")
     @PreAuthorize("@el.check('doc:list')")
-    public ResponseEntity<Object> documentList(@RequestBody DocumentVo vo){
-        if (StringUtils.isEmpty(vo.getDocType())){
-            return new ResponseEntity<>("文档类型不能为空",HttpStatus.OK);
-        }
-        return new ResponseEntity<>(documentService.getList(vo),HttpStatus.OK);
+    public ResponseEntity<Object> documentList(@Param("docType") String type){
+
+        return new ResponseEntity<>(documentService.getList(type),HttpStatus.OK);
     }
     @Log("生成文件")
     @ApiOperation("生成文件")

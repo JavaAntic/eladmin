@@ -30,7 +30,7 @@ public interface DocumentService {
      */
     void update(Document resources);
 
-    Object getList(DocumentVo vo);
+    Object getList(String docType);
 
     Object create(DocumentVo vo);
 
