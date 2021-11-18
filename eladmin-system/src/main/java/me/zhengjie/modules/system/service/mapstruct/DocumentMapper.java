@@ -7,6 +7,7 @@ import me.zhengjie.util.TypeConversionWorker;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 /**
@@ -18,6 +19,16 @@ import org.mapstruct.ReportingPolicy;
  */
 @Mapper(componentModel = "spring", uses = {TypeConversionWorker.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface DocumentMapper extends BaseMapper<DocumentDto, Document> {
+
+    /**
+     * DTO转Entity
+     *
+     * @param dto /
+     * @return /
+     */
+    @Named(value = "toEntity2")
+    @Mapping(target = "docNum", source = "docNum", qualifiedByName = "toJsonString")
+    Document toEntity2(DocumentDto dto);
 
     /**
      * DTO转Entity
