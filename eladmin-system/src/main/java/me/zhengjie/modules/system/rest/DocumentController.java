@@ -7,6 +7,7 @@ import me.zhengjie.annotation.Log;
 import me.zhengjie.modules.system.domain.Document;
 import me.zhengjie.modules.system.service.DocumentService;
 import me.zhengjie.modules.system.domain.vo.DocumentVo;
+import me.zhengjie.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,8 +55,27 @@ public class DocumentController {
     @Log("安全工具报告列表")
     @ApiOperation("安全工具报告列表")
     @PostMapping("/documentList")
-    @PreAuthorize("@el.check('doc:upload')")
+    @PreAuthorize("@el.check('doc:list')")
     public ResponseEntity<Object> documentList(@RequestBody DocumentVo vo){
+        if (StringUtils.isEmpty(vo.getDocumentType())){
+            return new ResponseEntity<>("文档类型不能为空",HttpStatus.OK);
+        }
         return new ResponseEntity<>(documentService.getList(vo),HttpStatus.OK);
     }
+    @Log("下载生成文件")
+    @ApiOperation("下载生成文件")
+    @PostMapping("/create")
+    @PreAuthorize("@el.check('doc:create')")
+    public ResponseEntity<Object> create(@RequestBody DocumentVo vo){
+        return new ResponseEntity<>(documentService.create(vo),HttpStatus.OK);
+    }
+
+    @Log("合并文件列表")
+    @ApiOperation("合并文件列表")
+    @PostMapping("/addList")
+    @PreAuthorize("@el.check('doc:addList')")
+    public ResponseEntity<Object> addList(@RequestBody DocumentVo vo){
+        return new ResponseEntity<>(documentService.addList(vo),HttpStatus.OK);
+    }
+
 }

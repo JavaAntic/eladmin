@@ -4,6 +4,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * DocumentVo
  *
@@ -15,4 +17,7 @@ public class DocumentVo {
 
     @ApiModelProperty(value = " 1:工具报告 2自定义报告3模板")
     private String documentType;
+
+    @ApiModelProperty(value = "段落")
+    private List<String> paragraphIds;
 }

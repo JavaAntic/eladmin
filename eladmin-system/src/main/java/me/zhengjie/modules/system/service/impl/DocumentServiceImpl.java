@@ -151,4 +151,19 @@ public class DocumentServiceImpl implements DocumentService {
         };
         return documentRepository.findAll(spec);
     }
+
+    @Override
+    public List<Document> create(DocumentVo vo) {
+        // 1.通过段落集合取得段落表所有段落信息
+        // 2.将段落信息进行筛选
+        //vo.getParagraphIds()
+        //return documentRepository.findAll(spec);
+        return null;
+    }
+    @Override
+    public List<Document> addList(DocumentVo vo) {
+        // 1.取得文件信息
+        // 2.将关联信息查出来返回前端
+        return null;
+    }
 }

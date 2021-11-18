@@ -31,4 +31,8 @@ public interface DocumentService {
     void update(Document resources);
 
     Object getList(DocumentVo vo);
+
+    Object create(DocumentVo vo);
+
+    Object addList(DocumentVo vo);
 }
