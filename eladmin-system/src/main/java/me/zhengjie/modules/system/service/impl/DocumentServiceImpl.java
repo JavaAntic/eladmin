@@ -9,6 +9,7 @@ import me.zhengjie.exception.BadRequestException;
 import me.zhengjie.modules.system.domain.Document;
 import me.zhengjie.modules.system.domain.DocumentParagraph;
 import me.zhengjie.modules.system.domain.DocumentTable;
+import me.zhengjie.modules.system.domain.vo.DocumentVo;
 import me.zhengjie.modules.system.repository.DocumentParagraphRepository;
 import me.zhengjie.modules.system.repository.DocumentRepository;
 import me.zhengjie.modules.system.repository.DocumentTableRepository;
@@ -18,20 +19,27 @@ import me.zhengjie.modules.system.service.mapstruct.DocumentMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentParagraphMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentTableMapper;
 import me.zhengjie.util.DocumentUtils;
-import me.zhengjie.util.FileTypeEnum;
-import me.zhengjie.util.SafeTypeEnum;
+import me.zhengjie.util.ReadWord;
 import me.zhengjie.utils.FileUtil;
 import me.zhengjie.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DocumentServiceImpl
