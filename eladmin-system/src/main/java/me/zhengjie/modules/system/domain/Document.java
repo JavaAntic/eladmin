@@ -1,7 +1,6 @@
 package me.zhengjie.modules.system.domain;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import me.zhengjie.base.BaseEntity;
@@ -42,7 +41,6 @@ public class Document extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "文件类型 0:word 1:pdf 2:excel")
     private String fileType;
 
-    @NotBlank
     @ApiModelProperty(value = "安全类型0:通付盾 1:梆梆安全 2:爱加密")
     private String safeType;
 
@@ -65,9 +63,8 @@ public class Document extends BaseEntity implements Serializable {
     public Document() {
     }
 
-    public Document(@NotBlank String fileName, @NotBlank String fileType, @NotBlank String safeType, @NotBlank String filePath, @NotBlank Integer docNum, @NotBlank String docType) {
+    public Document(@NotBlank String fileName, @NotBlank String fileType, @NotBlank String filePath, @NotBlank Integer docNum, @NotBlank String docType) {
         this.fileType = fileType;
-        this.safeType = safeType;
         this.fileName = fileName;
         this.filePath = filePath;
         this.docNum = docNum;

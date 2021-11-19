@@ -821,7 +821,7 @@ DROP TABLE IF EXISTS `st_document`;
 CREATE TABLE `st_document` (
   `id` varchar(32) NOT NULL COMMENT 'id',
   `file_type` varchar(1) NOT NULL COMMENT '文件类型 0:word 1:pdf 2:excel',
-  `safe_type` varchar(1) NOT NULL COMMENT '安全类型0:通付盾 1:梆梆安全 2:爱加密',
+  `safe_type` varchar(1) DEFAULT NULL COMMENT '安全类型0:通付盾 1:梆梆安全 2:爱加密',
   `file_name` varchar(100) NOT NULL COMMENT '文件名称',
   `file_path` varchar(255) NOT NULL COMMENT '文件路径',
   `doc_num` int(11) NOT NULL COMMENT '文档编号',

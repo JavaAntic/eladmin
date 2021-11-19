@@ -125,14 +125,9 @@ public class DocumentServiceImpl implements DocumentService {
         final int fileTypeIndex = fileTypeList.indexOf(suffix);
         final String fileType = String.valueOf(fileTypeIndex);
         final String safeType = String.valueOf(safeTypeList.indexOf(subName));
-        final Document first = documentRepository.findFirstByDocTypeOrderByDocNumDesc(docType);
-        int docNum;
-        if (first == null) {
-            docNum = 1;
-        } else {
-            docNum = first.getDocNum() + 1;
-        }
-        final Document document = new Document(name, fileType, safeType, file.getAbsolutePath(), docNum, docType);
+        int docNum = getDocNum(docType);
+        final Document document = new Document(name, fileType, file.getAbsolutePath(), docNum, docType);
+        document.setSafeType(safeType);
 //        try {
         final Document save = documentRepository.save(document);
         if (!isModel) {
@@ -142,6 +137,17 @@ public class DocumentServiceImpl implements DocumentService {
 //            FileUtil.del(file);
 //            throw e;
 //        }
+    }
+
+    private int getDocNum(String docType) {
+        final Document first = documentRepository.findFirstByDocTypeOrderByDocNumDesc(docType);
+        int docNum;
+        if (first == null) {
+            docNum = 1;
+        } else {
+            docNum = first.getDocNum() + 1;
+        }
+        return docNum;
     }
 
     /**
@@ -216,6 +222,7 @@ public class DocumentServiceImpl implements DocumentService {
 //    }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String create(DocumentVo vo) {
         String fileName = "ZDY"+System.currentTimeMillis();
         String templatePath = filePath +"/MD";
@@ -270,6 +277,10 @@ public class DocumentServiceImpl implements DocumentService {
 
         ReadWord.writeDocument(templatePath+"/"+vo.getTemplateName()+".docx",new String[]{outPath,fileName},paragraphMap,familyListMap);
        // 将该文件进行保存
+        String docType = "1";
+        int docNum = getDocNum(docType);
+        final Document document = new Document(fileName, "0", outPath + "/" + fileName, docNum, docType);
+        documentRepository.save(document);
         return "文件创建成功";
     }
 //    @Override
