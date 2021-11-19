@@ -9,6 +9,7 @@ import me.zhengjie.modules.system.domain.vo.DocumentVo;
 import me.zhengjie.modules.system.service.DocumentService;
 import me.zhengjie.modules.system.service.dto.DocumentQueryCriteria;
 import org.springframework.data.domain.Pageable;
+import me.zhengjie.utils.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -61,12 +62,15 @@ public class DocumentController {
         return new ResponseEntity<>(documentService.queryAll(criteria, pageable), HttpStatus.OK);
     }
 
-    @Log("下载生成文件")
-    @ApiOperation("下载生成文件")
+    @Log("生成文件")
+    @ApiOperation("生成文件")
     @PostMapping("/create")
     @PreAuthorize("@el.check('doc:create')")
-    public ResponseEntity<Object> create(@RequestBody DocumentVo vo) {
-        return new ResponseEntity<>(documentService.create(vo), HttpStatus.OK);
+    public ResponseEntity<Object> create(@RequestBody DocumentVo vo) throws Exception {
+        if(StringUtils.isEmpty(vo.getTemplateName())){
+            throw new Exception("模板不能为空");
+        }
+        return new ResponseEntity<>(documentService.create(vo),HttpStatus.OK);
     }
 
     @ApiOperation("所有文件列表查询")

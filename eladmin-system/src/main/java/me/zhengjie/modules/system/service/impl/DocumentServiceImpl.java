@@ -21,6 +21,7 @@ import me.zhengjie.modules.system.service.mapstruct.DocumentParagraphMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentTableMapper;
 import me.zhengjie.util.DocumentUtils;
 import me.zhengjie.util.ReadWord;
+import me.zhengjie.util.ReadWordCopy;
 import me.zhengjie.utils.FileUtil;
 import me.zhengjie.utils.PageUtil;
 import me.zhengjie.utils.QueryHelp;
@@ -214,9 +215,10 @@ public class DocumentServiceImpl implements DocumentService {
 //    }
 
     @Override
-    public List<Document> create(DocumentVo vo) {
+    public String create(DocumentVo vo) {
         String fileName = "ZDY"+System.currentTimeMillis();
-        String path = filePath +"/ZDY/"+fileName+".docx";
+        String templatePath = filePath +"/MD";
+        String outPath = filePath +"/ZDY";
         // 生成文档首页信息
         Map<String, String> paragraphMap = new HashMap<>();
         paragraphMap.put("head", vo.getHead());
@@ -224,20 +226,50 @@ public class DocumentServiceImpl implements DocumentService {
         paragraphMap.put("time", LocalDate.now().toString());
         paragraphMap.put("system", "poc");
 
-        // 生成文档表格数据
-        List<String[]> familyList = new ArrayList<>();
-        List<String[]> familyList1 = new ArrayList<>();
+        // ------------数据拼装格式begin-----------------
+        //familyList.add(new String[]{"露娜", "女", "野友", "666", "6660"});
+        //familyList1.add(new String[]{"露娜1", "女", "野友", "666", "6660"});
+        //familyList1.add(new String[]{"貂蝉1", "女", "法友", "888", "8880"});
+        //familyListMap.put("tl0", familyList);
+        //familyListMap.put("tl1", familyList1)
+        // ------------数据拼装格式end-----------------;
+        // 表格集合
         Map<String, List<String[]>> familyListMap = new HashMap<>();
-        familyList.add(new String[]{"露娜", "女", "野友", "666", "6660"});
-        familyList.add(new String[]{"太乙真人", "男", "辅友", "111", "1110"});
-        familyList.add(new String[]{"貂蝉", "女", "法友", "888", "8880"});
-        familyList1.add(new String[]{"露娜1", "女", "野友", "666", "6660"});
-        familyList1.add(new String[]{"貂蝉1", "女", "法友", "888", "8880"});
-        familyListMap.put("tl0", familyList);
-        familyListMap.put("tl1", familyList1);
-        ReadWord.writeDocument(path,paragraphMap,familyListMap);
+
+        for (int i = 0; i < vo.getDocumentTables().size(); i++) {
+            // 表格
+            List<String[]> familyList1 = new ArrayList<>();
+            DocumentTable table = vo.getDocumentTables().get(i);
+            // 数据库中数据转化
+            List<ReadWordCopy.TableRow> tableRows =( List<ReadWordCopy.TableRow>) JSONObject.parse(table.getRows());
+           // 每一行数据
+            for (int j = 0; j < tableRows.size(); j++) {
+                // 表格中行
+                List<String[]> familyList = new ArrayList<>();
+                // 行中每一列的数据
+                List<ReadWordCopy.TableCell> cells = tableRows.get(j).getCells();
+                for (int k = 0; k < cells.size(); k++) {
+                    // 中有段落
+                    List<ReadWordCopy.Paragraph> paragraphs = cells.get(k).getParagraphs();
+                    // 每一个表格中的文本
+                    String[] text = new String[paragraphs.size()];
+                    for (int m = 0; m < paragraphs.size(); m++) {
+                       String paragraphText = paragraphs.get(m).getText();
+                        text[m] = paragraphText;
+                    }
+                    // 将一行中的每一列的数据填充完整
+                    familyList.add(text);
+                }
+                // 将表格中每一列的数据填充到表格里
+                familyList1.addAll(familyList);
+            }
+            // 将每一个表格填充到map中
+            familyListMap.put("tl"+i+1, familyList1);
+        }
+
+        ReadWord.writeDocument(templatePath+"/"+vo.getTemplateName()+".docx",new String[]{outPath,fileName},paragraphMap,familyListMap);
        // 将该文件进行保存
-        return null;
+        return "文件创建成功";
     }
 //    @Override
 //    public List<Document> addList(DocumentVo vo) {
