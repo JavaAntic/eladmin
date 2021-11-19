@@ -34,7 +34,8 @@ public class ReadWord {
         familyList1.add(new String[]{"貂蝉1", "女", "法友", "888", "8880"});
         familyListMap.put("tl0", familyList);
         familyListMap.put("tl1", familyList1);
-        writeDocument("D:\\Desktop\\poc\\template\\template.docx", paragraphMap, familyListMap);
+        String[] outPath = new String[]{"D:\\Desktop\\个人\\test","zzz.docx"};
+        writeDocument("D:\\Desktop\\poc\\template\\template.docx", outPath, paragraphMap, familyListMap);
     }
 
     /**
@@ -44,7 +45,7 @@ public class ReadWord {
      * @param paragraphMap  文档中数据集合
      * @param familyListMap 表格信息
      */
-    public static void writeDocument(String templatePath, Map<String, String> paragraphMap, Map<String, List<String[]>> familyListMap) {
+    public static void writeDocument(String templatePath, String[] outPath, Map<String, String> paragraphMap, Map<String, List<String[]>> familyListMap) {
         File file = new File(templatePath);
         InputStream inputStream = null;
         try {
@@ -54,10 +55,10 @@ public class ReadWord {
         }
         byte[] a = exportWord(inputStream, paragraphMap, familyListMap);
         InputStream sbs = new ByteArrayInputStream(a);
-        byteToFile(a, "D:\\Desktop\\个人\\test", "zzz.docx");
+        byteToFile(a, outPath[0], outPath[1]);
         Runtime run = Runtime.getRuntime();
         try {
-            Process process = run.exec("cmd.exe /c " + "D:\\Desktop\\个人\\test\\zzz.docx");
+            Process process = run.exec("cmd.exe /c " + outPath[0]+"/"+outPath[1]);
             InputStream in = process.getInputStream();
             while (in.read() != -1) {
                 System.out.println(in.read());
