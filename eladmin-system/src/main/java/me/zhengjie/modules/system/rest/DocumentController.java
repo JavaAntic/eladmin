@@ -60,7 +60,10 @@ public class DocumentController {
     @ApiOperation("生成文件")
     @PostMapping("/create")
     @PreAuthorize("@el.check('doc:create')")
-    public ResponseEntity<Object> create(@RequestBody DocumentVo vo){
+    public ResponseEntity<Object> create(@RequestBody DocumentVo vo) throws Exception {
+        if(StringUtils.isEmpty(vo.getTemplateName())){
+            throw new Exception("模板不能为空");
+        }
         return new ResponseEntity<>(documentService.create(vo),HttpStatus.OK);
     }
 

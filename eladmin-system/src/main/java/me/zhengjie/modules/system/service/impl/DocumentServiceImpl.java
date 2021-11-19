@@ -253,7 +253,7 @@ public class DocumentServiceImpl implements DocumentService {
             familyListMap.put("tl"+i+1, familyList1);
         }
 
-        ReadWord.writeDocument(templatePath+"/"+vo.getTemplateName(),new String[]{outPath,fileName},paragraphMap,familyListMap);
+        ReadWord.writeDocument(templatePath+"/"+vo.getTemplateName()+".docx",new String[]{outPath,fileName},paragraphMap,familyListMap);
        // 将该文件进行保存
         return "文件创建成功";
     }
