@@ -2,7 +2,13 @@ package me.zhengjie.modules.system.service;
 
 import me.zhengjie.modules.system.domain.Document;
 import me.zhengjie.modules.system.domain.vo.DocumentVo;
+import me.zhengjie.modules.system.service.dto.DocumentDto;
+import me.zhengjie.modules.system.service.dto.DocumentQueryCriteria;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * DocumentService
@@ -30,9 +36,28 @@ public interface DocumentService {
      */
     void update(Document resources);
 
-    Object getList(DocumentVo vo);
-
+    /**
+     * @param vo /
+     * @return /
+     */
     Object create(DocumentVo vo);
 
-    Object addList(DocumentVo vo);
+    /**
+     * 分页查询
+     *
+     * @param criteria 条件
+     * @param pageable 分页参数
+     * @return /
+     */
+    Map<String, Object> queryAll(DocumentQueryCriteria criteria, Pageable pageable);
+
+    /**
+     * 列表查询
+     *
+     * @param criteria 条件
+     * @return /
+     */
+    List<DocumentDto> queryAll(DocumentQueryCriteria criteria);
+//
+//    List<DocumentTableDto> query(String documentId);
 }

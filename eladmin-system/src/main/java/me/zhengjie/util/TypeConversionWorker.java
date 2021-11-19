@@ -51,8 +51,13 @@ public class TypeConversionWorker {
         if (first != null) {
             final int targetLen = String.valueOf(first.getDocNum()).length();
             final int sourceLen = String.valueOf(docNum).length();
-            String format = "%0" + (targetLen - sourceLen) + "d";
-            strDocNum = prefix + String.format(format, docNum);
+            final int len = targetLen - sourceLen;
+            if (len == 0) {
+                strDocNum = prefix + docNum;
+            } else {
+                String format = "%0" + len + "d";
+                strDocNum = prefix + String.format(format, docNum);
+            }
         } else {
             strDocNum = prefix + docNum;
         }

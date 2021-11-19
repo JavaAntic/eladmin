@@ -15,16 +15,20 @@ import me.zhengjie.modules.system.repository.DocumentRepository;
 import me.zhengjie.modules.system.repository.DocumentTableRepository;
 import me.zhengjie.modules.system.service.DocumentService;
 import me.zhengjie.modules.system.service.dto.DocumentDto;
+import me.zhengjie.modules.system.service.dto.DocumentQueryCriteria;
 import me.zhengjie.modules.system.service.mapstruct.DocumentMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentParagraphMapper;
 import me.zhengjie.modules.system.service.mapstruct.DocumentTableMapper;
 import me.zhengjie.util.DocumentUtils;
 import me.zhengjie.util.ReadWord;
 import me.zhengjie.utils.FileUtil;
+import me.zhengjie.utils.PageUtil;
+import me.zhengjie.utils.QueryHelp;
 import me.zhengjie.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -185,17 +189,29 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void update(Document resources) {
-
+    public Map<String, Object> queryAll(DocumentQueryCriteria criteria, Pageable pageable) {
+        Page<Document> page = documentRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, criteria, cb), pageable);
+        return PageUtil.toPage(page.map(documentMapper::toDto));
     }
 
     @Override
-    public List<Document> getList(DocumentVo vo) {
-        Specification<Document> spec = (root, query, cb) -> {
-            return cb.and(cb.equal(root.get("doc_type").as(String.class), vo.getDocType()));
-        };
-        return documentRepository.findAll(spec);
+    public List<DocumentDto> queryAll(DocumentQueryCriteria criteria) {
+        List<Document> list = documentRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, criteria, cb));
+        return documentMapper.toDto(list);
     }
+
+    @Override
+    public void update(Document resources) {
+
+    }
+//
+//    @Override
+//    public List<Document> getList(DocumentVo vo) {
+//        Specification<Document> spec = (root, query, cb) -> {
+//            return cb.and(cb.equal(root.get("doc_type").as(String.class), vo.getDocType()));
+//        };
+//        return documentRepository.findAll(spec);
+//    }
 
     @Override
     public List<Document> create(DocumentVo vo) {
@@ -223,10 +239,10 @@ public class DocumentServiceImpl implements DocumentService {
        // 将该文件进行保存
         return null;
     }
-    @Override
-    public List<Document> addList(DocumentVo vo) {
-        // 1.取得文件信息
-        // 2.将关联信息查出来返回前端
-        return null;
-    }
+//    @Override
+//    public List<Document> addList(DocumentVo vo) {
+//        // 1.取得文件信息
+//        // 2.将关联信息查出来返回前端
+//        return null;
+//    }
 }

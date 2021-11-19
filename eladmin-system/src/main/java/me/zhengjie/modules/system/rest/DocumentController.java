@@ -5,15 +5,21 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.annotation.Log;
 import me.zhengjie.modules.system.domain.Document;
-import me.zhengjie.modules.system.service.DocumentService;
 import me.zhengjie.modules.system.domain.vo.DocumentVo;
-import me.zhengjie.utils.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import me.zhengjie.modules.system.service.DocumentService;
+import me.zhengjie.modules.system.service.dto.DocumentQueryCriteria;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -30,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocumentController {
     private final DocumentService documentService;
 
+    @Log("上传文件")
     @ApiOperation("上传文件")
     @PostMapping
     @PreAuthorize("@el.check('doc:upload')")
@@ -47,30 +54,33 @@ public class DocumentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("安全工具报告列表")
-    @ApiOperation("安全工具报告列表")
-    @GetMapping("/documentList")
+    @ApiOperation("文件列表查询")
+    @GetMapping
     @PreAuthorize("@el.check('doc:list')")
-    public ResponseEntity<Object> documentList(@RequestBody DocumentVo vo){
-        if (StringUtils.isEmpty(vo.getDocType())){
-            return new ResponseEntity<>("文档类型不能为空",HttpStatus.OK);
-        }
-        return new ResponseEntity<>(documentService.getList(vo),HttpStatus.OK);
+    public ResponseEntity<Object> query(DocumentQueryCriteria criteria, Pageable pageable) {
+        return new ResponseEntity<>(documentService.queryAll(criteria, pageable), HttpStatus.OK);
     }
+
     @Log("下载生成文件")
     @ApiOperation("下载生成文件")
     @PostMapping("/create")
     @PreAuthorize("@el.check('doc:create')")
-    public ResponseEntity<Object> create(@RequestBody DocumentVo vo){
-        return new ResponseEntity<>(documentService.create(vo),HttpStatus.OK);
+    public ResponseEntity<Object> create(@RequestBody DocumentVo vo) {
+        return new ResponseEntity<>(documentService.create(vo), HttpStatus.OK);
     }
 
-    @Log("合并文件列表")
-    @ApiOperation("合并文件列表")
-    @PostMapping("/addList")
-    @PreAuthorize("@el.check('doc:addList')")
-    public ResponseEntity<Object> addList(@RequestBody DocumentVo vo){
-        return new ResponseEntity<>(documentService.addList(vo),HttpStatus.OK);
+    @ApiOperation("所有文件列表查询")
+    @GetMapping(value = "/all")
+    @PreAuthorize("@el.check('doc:listAll')")
+    public ResponseEntity<Object> queryAll(DocumentQueryCriteria criteria) {
+        return new ResponseEntity<>(documentService.queryAll(criteria), HttpStatus.OK);
     }
+//
+//    @ApiOperation("文件详情查询")
+//    @GetMapping(value = "/detail")
+//    @PreAuthorize("@el.check('doc:detail')")
+//    public ResponseEntity<Object> query(@RequestParam String documentId) {
+//        return new ResponseEntity<>(documentService.query(documentId), HttpStatus.OK);
+//    }
 
 }
