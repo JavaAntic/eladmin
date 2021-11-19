@@ -2,7 +2,6 @@ package me.zhengjie.modules.system.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.spire.pdf.FileFormat;
 import com.spire.pdf.PdfDocument;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +67,7 @@ public class DocumentServiceImpl implements DocumentService {
     private final FileProperties properties;
     @Value("${upload.filePath}")
     public String filePath;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void upload(String name, Boolean isModel, MultipartFile multipartFile) throws Exception {
@@ -276,11 +276,12 @@ public class DocumentServiceImpl implements DocumentService {
             // 将每一个表格填充到map中
             familyListMap.put("tl"+i, familyList1);
         }
-        ReadWord.writeDocument(templatePath+"/"+vo.getTemplateName()+".docx",new String[]{outPath,fileName+".docx"},paragraphMap,familyListMap);
+        final String fullFileName = fileName + ".docx";
+        ReadWord.writeDocument(templatePath+"/"+vo.getTemplateName()+".docx",new String[]{outPath, fullFileName},paragraphMap,familyListMap);
         // 将该文件进行保存
         String docType = "1";
         int docNum = getDocNum(docType);
-        final Document document = new Document(fileName, "0", outPath + "/" + fileName, docNum, docType);
+        final Document document = new Document(fullFileName, "0", outPath + "/" + fullFileName, docNum, docType);
         documentRepository.save(document);
         return "文件创建成功";
     }
