@@ -40,7 +40,7 @@ public interface DocumentService {
      * @param vo /
      * @return /
      */
-    Object create(DocumentVo vo);
+    Object create(DocumentVo vo) throws Exception;
 
     /**
      * 分页查询

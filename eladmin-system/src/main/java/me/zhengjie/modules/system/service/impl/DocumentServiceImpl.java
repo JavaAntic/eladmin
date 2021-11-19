@@ -1,6 +1,7 @@
 package me.zhengjie.modules.system.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.spire.pdf.FileFormat;
 import com.spire.pdf.PdfDocument;
@@ -216,7 +217,7 @@ public class DocumentServiceImpl implements DocumentService {
 //    }
 
     @Override
-    public String create(DocumentVo vo) {
+    public String create(DocumentVo vo) throws Exception {
         String fileName = "ZDY"+System.currentTimeMillis();
         String templatePath = filePath +"/MD";
         String outPath = filePath +"/ZDY";
@@ -242,34 +243,34 @@ public class DocumentServiceImpl implements DocumentService {
             List<String[]> familyList1 = new ArrayList<>();
             DocumentTable table = vo.getDocumentTables().get(i);
             // 数据库中数据转化
-            List<ReadWordCopy.TableRow> tableRows =( List<ReadWordCopy.TableRow>) JSONObject.parse(table.getRows());
+            List<ReadWordCopy.TableRow> tableRows = JSONArray.parseArray(table.getRows(),ReadWordCopy.TableRow.class);
            // 每一行数据
             for (int j = 0; j < tableRows.size(); j++) {
                 // 表格中行
                 List<String[]> familyList = new ArrayList<>();
                 // 行中每一列的数据
                 List<ReadWordCopy.TableCell> cells = tableRows.get(j).getCells();
+                String[] text = new String[cells.size()];
                 for (int k = 0; k < cells.size(); k++) {
                     // 中有段落
                     List<ReadWordCopy.Paragraph> paragraphs = cells.get(k).getParagraphs();
                     // 每一个表格中的文本
-                    String[] text = new String[paragraphs.size()];
+                    String paragraphText ="";
                     for (int m = 0; m < paragraphs.size(); m++) {
-                       String paragraphText = paragraphs.get(m).getText();
-                        text[m] = paragraphText;
+                        paragraphText  = paragraphText + paragraphs.get(m).getText();
                     }
+                    text[k] = paragraphText;
                     // 将一行中的每一列的数据填充完整
-                    familyList.add(text);
                 }
+                familyList.add(text);
                 // 将表格中每一列的数据填充到表格里
                 familyList1.addAll(familyList);
             }
             // 将每一个表格填充到map中
-            familyListMap.put("tl"+i+1, familyList1);
+            familyListMap.put("tl"+i, familyList1);
         }
-
-        ReadWord.writeDocument(templatePath+"/"+vo.getTemplateName()+".docx",new String[]{outPath,fileName},paragraphMap,familyListMap);
-       // 将该文件进行保存
+        ReadWord.writeDocument(templatePath+"/"+vo.getTemplateName()+".docx",new String[]{outPath,fileName+".docx"},paragraphMap,familyListMap);
+        // 将该文件进行保存
         return "文件创建成功";
     }
 //    @Override

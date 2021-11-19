@@ -35,7 +35,11 @@ public class ReadWord {
         familyListMap.put("tl0", familyList);
         familyListMap.put("tl1", familyList1);
         String[] outPath = new String[]{"D:\\Desktop\\个人\\test","zzz.docx"};
-        writeDocument("D:\\Desktop\\poc\\template\\template.docx", outPath, paragraphMap, familyListMap);
+        try {
+            writeDocument("D:\\Desktop\\poc\\template\\template.docx", outPath, paragraphMap, familyListMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -45,29 +49,20 @@ public class ReadWord {
      * @param paragraphMap  文档中数据集合
      * @param familyListMap 表格信息
      */
-    public static void writeDocument(String templatePath, String[] outPath, Map<String, String> paragraphMap, Map<String, List<String[]>> familyListMap) {
+    public static void writeDocument(String templatePath, String[] outPath, Map<String, String> paragraphMap, Map<String, List<String[]>> familyListMap) throws Exception{
         File file = new File(templatePath);
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = new FileInputStream(file);
         byte[] a = exportWord(inputStream, paragraphMap, familyListMap);
         InputStream sbs = new ByteArrayInputStream(a);
         byteToFile(a, outPath[0], outPath[1]);
         Runtime run = Runtime.getRuntime();
-        try {
-            Process process = run.exec("cmd.exe /c " + outPath[0]+"/"+outPath[1]);
-            InputStream in = process.getInputStream();
-            while (in.read() != -1) {
-                System.out.println(in.read());
-            }
-            in.close();
-            process.waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
+        Process process = run.exec("cmd.exe /c " + outPath[0]+"/"+outPath[1]);
+        InputStream in = process.getInputStream();
+        while (in.read() != -1) {
+            System.out.println(in.read());
         }
+        in.close();
+        process.waitFor();
     }
 
     /**
