@@ -8,6 +8,8 @@ import me.zhengjie.modules.system.domain.Document;
 import me.zhengjie.modules.system.domain.vo.DocumentVo;
 import me.zhengjie.modules.system.service.DocumentService;
 import me.zhengjie.modules.system.service.dto.DocumentQueryCriteria;
+import me.zhengjie.util.ReadWord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import me.zhengjie.utils.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+
 /**
  * DocumentController
  *
@@ -37,6 +43,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocumentController {
     private final DocumentService documentService;
 
+    @Value("${upload.filePath}")
+    public String filePath;
     @Log("上传文件")
     @ApiOperation("上传文件")
     @PostMapping
@@ -79,12 +87,50 @@ public class DocumentController {
     public ResponseEntity<Object> queryAll(DocumentQueryCriteria criteria) {
         return new ResponseEntity<>(documentService.queryAll(criteria), HttpStatus.OK);
     }
-//
-//    @ApiOperation("文件详情查询")
-//    @GetMapping(value = "/detail")
-//    @PreAuthorize("@el.check('doc:detail')")
-//    public ResponseEntity<Object> query(@RequestParam String documentId) {
-//        return new ResponseEntity<>(documentService.query(documentId), HttpStatus.OK);
-//    }
+
+    /**
+     * 上传模板
+     * @param file 文件
+     */
+    @PostMapping("/uploadTemplate")
+    @ApiOperation("上传模板")
+    public ResponseEntity<Object> uploadTemplate(@RequestParam("file") MultipartFile file)  throws Exception{
+        if (file.isEmpty()) {
+            throw new Exception("上传失败，请添加文件");
+        }
+        return new ResponseEntity<>(documentService.uploadTemplate(file), HttpStatus.OK);
+    }
+
+    /**
+     * @param path 想要下载的文件的路径
+     * @功能描述 下载文件:
+     */
+    @PostMapping("/download")
+    @ApiOperation("下载文件")
+    public void download(@RequestParam("path") String path, HttpServletResponse response) {
+        System.out.println(path);
+        try {
+            ReadWord.downFile(filePath + path,response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Exception( "下载失败，原因:"+e.getMessage());
+        }
+    }
+
+    /**
+     * 下载基本模板
+     * @功能描述 下载基本模板:
+     */
+    @PostMapping("/downloadBaseTemplate")
+    @ApiOperation("下载基本模板")
+    public void downloadBaseTemplate(HttpServletResponse response) {
+        String path = "/baseTemplate/baseTemplate.docx";
+        try {
+            ReadWord.downFile(filePath + path, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Exception("下载失败，原因:" + e.getMessage());
+        }
+    }
 
 }

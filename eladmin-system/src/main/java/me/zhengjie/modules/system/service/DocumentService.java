@@ -58,6 +58,8 @@ public interface DocumentService {
      * @return /
      */
     List<DocumentDto> queryAll(DocumentQueryCriteria criteria);
+
+    Object uploadTemplate(MultipartFile file) throws Exception;
 //
 //    List<DocumentTableDto> query(String documentId);
 }

@@ -31,6 +31,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -213,7 +215,8 @@ public class DocumentServiceImpl implements DocumentService {
     public void update(Document resources) {
 
     }
-//
+
+    //
 //    @Override
 //    public List<Document> getList(DocumentVo vo) {
 //        Specification<Document> spec = (root, query, cb) -> {
@@ -284,6 +287,33 @@ public class DocumentServiceImpl implements DocumentService {
         final Document document = new Document(fullFileName, "0", outPath + "/" + fullFileName, docNum, docType);
         documentRepository.save(document);
         return "文件创建成功";
+    }
+
+    @Override
+    public Object uploadTemplate(MultipartFile file) throws Exception{
+        String fileName = System.currentTimeMillis() + file.getOriginalFilename();
+        String fileType = fileName.substring(fileName.lastIndexOf("."));
+
+        System.out.println(filePath + fileName);
+        File dest = new File(filePath + "/template/" + fileName);
+        if (!dest.exists()) {
+            dest.mkdirs();
+        }
+        try {
+            file.transferTo(dest);
+            System.out.println("上传成功");
+            // 将该文件进行保存
+            String docType = "1";
+            int docNum = getDocNum(docType);
+            final Document document = new Document(fileName, "2", filePath + "/" + fileName, docNum, docType);
+            documentRepository.save(document);
+            return new ResponseEntity<>(fileName, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("失敗"+e.getMessage());
+            throw new Exception("上传失败，请重新上传");
+        }
+
     }
 //    @Override
 //    public List<Document> addList(DocumentVo vo) {
