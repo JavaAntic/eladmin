@@ -286,7 +286,7 @@ public class DocumentServiceImpl implements DocumentService {
         int docNum = getDocNum(docType);
         final Document document = new Document(fullFileName, "0", outPath + "/" + fullFileName, docNum, docType);
         documentRepository.save(document);
-        return "文件创建成功";
+        return outPath + "/" + fullFileName;
     }
 
     @Override
